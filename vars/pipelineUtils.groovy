@@ -19,6 +19,22 @@ class PipelineUtils {
                             ]
                         }
                     }
+                    stage('Build Image') {
+    steps {
+        script {
+            sh 'docker build -t jaydeep .'
+        }
+    }
+}
+
+stage('Access Image Locally') {
+    steps {
+        script {
+            sh 'docker run -p 8085:3000 jaydeep'
+        }
+    }
+}
+
                 }
 
                 // Add other stages as needed
