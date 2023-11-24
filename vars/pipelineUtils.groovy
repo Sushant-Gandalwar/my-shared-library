@@ -1,39 +1,39 @@
+pipeline {
+    agent any
 
-package shared.utils class PipelineUtils {
-    static def createPipeline(Map pipelineConfig) {
-        echo "Creating pipeline with Git URL: ${pipelineConfig.scmUrl}"
+    environment {
+        // Define environment variables if needed
+    }
 
-        pipeline {
-            agent any stages {
-                stage('Checkout') {
-                    steps {
-                        script {
-                            // Use the Git URL from the pipelineConfig
-                            checkout scm: [$class: 'GitSCM',
-                                    branches: [ [name: pipelineConfig.branch]],
-                                    userRemoteConfigs: [ [url: pipelineConfig.scmUrl]]]
-                            }
-                        }
+    stages {
+        stage('INITIALIZE') {
+            steps {
+                script {
+                    echo "Initializing environment for webstore delivery pipeline"
+                    echo 'Start Initializing!'
+                    def valuesYaml = loadValuesYaml()
+                    git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
 
-                        stage('Build Image') {
-                            steps {
-                                script {
-                                    sh 'docker build -t jaydeep .'
-                                }
-                            }
-                        }
-
-                        stage('Access Image Locally') {
-                            steps {
-                                script {
-                                    sh 'docker run -p 8085:3000 jaydeep'
-                                }
-                            }
-                        }
+                    if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'master') {
+                        // Additional logic for handling conditions
                     }
-
-                    
                 }
             }
         }
+
+        // Add more stages as needed
     }
+
+    post {
+        always {
+            // Cleanup or other actions that should be performed regardless of the pipeline result
+        }
+    }
+}
+
+def loadValuesYaml() {
+    // Implement your logic to load values from a YAML file
+    // For example, you can use a library like SnakeYAML
+    // Here, a dummy map is returned for illustration purposes
+    return [key1: 'value1', key2: 'value2']
+}
