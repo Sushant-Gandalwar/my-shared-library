@@ -1,40 +1,31 @@
 // common.groovy
+def call(Map pipelineParams) {
+ 
+    pipeline {
 
-def checkoutAndBuildProject(scmUrl, branch, appName, buildCommand) {
-    stage('Checkout') {
-        steps {
-            script {
-                checkout scmGit(scmUrl, branch)
-                sh buildCommand
+        agent any
+        stages {
+
+            stage('INITIALIZE') {
+
+                steps {
+
+                    script {
+
+                        log.info("Initializing environment for webstore delivery pipeline")
+
+                        echo 'Start Initializing!'
+
+                        valuesYaml = loadValuesYaml()
+
+                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl                  
+
+                    }
+
+                }
+
             }
         }
     }
 }
-
-def buildDockerImage(imageName, dockerfile) {
-    stage('Build Docker Image') {
-        steps {
-            script {
-                sh "docker build -t $imageName -f $dockerfile ."
-            }
-        }
-    }
-}
-
-def runDockerContainer(portMapping, imageName) {
-    stage('Run Docker Container') {
-        steps {
-            script {
-                sh "docker run -p $portMapping $imageName"
-            }
-        }
-    }
-}
-
-def scmGit(scmUrl, branch) {
-    return [
-        $class: 'GitSCM',
-        branches: [[name: branch]],
-        userRemoteConfigs: [[url: scmUrl]]
-    ]
-}
+        
