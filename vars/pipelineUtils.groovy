@@ -1,4 +1,7 @@
 // common.groovy
+class pipelineUtils 
+{
+    def log
 def call(Map pipelineParams) {
     pipeline {
         agent any
@@ -38,6 +41,7 @@ def call(Map pipelineParams) {
             }
         }
     }
+ }
 }
 
 
