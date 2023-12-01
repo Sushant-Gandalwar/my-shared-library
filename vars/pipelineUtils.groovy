@@ -12,7 +12,7 @@ def call(Map pipelineParams) {
                         log.info("Initializing environment for webstore delivery pipeline")
                         echo 'Start Initializing!'
                         valuesYaml = loadValuesYaml()
-                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
+                        git branch: pipelineParams.branch, url: pipelineParams.scmUrl
                     }
                 }
             }
