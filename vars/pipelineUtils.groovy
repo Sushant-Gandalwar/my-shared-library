@@ -1,5 +1,5 @@
 class pipelineUtils {
-    def pipeline(Map pipelineParams) {
+    def runPipeline(Map pipelineParams) {
         pipeline {
             agent any
             parameters {
