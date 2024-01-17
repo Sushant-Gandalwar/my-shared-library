@@ -1,41 +1,8 @@
-/*
-Author: Venu Rachakonda <venu.rachakonda@rackspace.com>
-
-lagomDeliveryPipeline - Shared pipeline for lagom micro Services or similar type of services which depend on `sbt` to build applications
-
-Pipline that checksout a repository from SCM, perform build, test and deploy them to one or more kubernetes clusters.
-
-This library is meant to be included from Jenkinsfile in actual service repository that defines a lagomDeliveryPipeline() block similar to the one listed below.
-After defining lagomDeliveryPipeline(), the only other line necessary is at top of Jenkinsfile
-
-   @Library('shared-utils') _
-
-Jenkinsfile will pass all arguments from the block to this pipeline script.
-
-Any Jenkinsfile that have a pattern of using apiGateway or maven build should include this pipeline library and they
-must have a lagomDeliveryPipeline() function defined.
-
-Do not uncomment this sample Jenkinsfile.  Instead, copy it into the calling lagom service or sbt service and uncomment it there.
-
-lagomDeliveryPipeline(scmUrl: 'Bitbucket URL for service or application',
-                      branch: env.BRANCH_NAME 'No need to change this',
-                      bitbucketCredentialsId: 'Credentials ID in Jenkins, able to checkout bitbucket repositories in ARC-BMUSA workspace',
-                      appName: 'Application name. e.g. organization-impl',
-                      dockerDirectory: 'Directory where dockerfile exists e.g. organization-impl/target/docker/stage',
-                      dockerImage: 'gcr.io/brandsmart-usa-tooling/application_name e.g: gcr.io/brandsmart-usa-tooling/organization-impl',
-                      dockerCredentialsId: 'docker credentials id e.g.: brandsmart-usa-tooling',
-                      databaseCredentialsId: 'this is database credentials Id for Service e.g.:organization-db-creds, NOTE: In jenkins this credentials name should be "ENV-app-db-creds" e.g.:  uat-organization-db-creds',
-                      unitTests: false, if unitTests exist this flag should be 'true', or leave 'false',
-                      flywayMigrate: true, if flyways exist this flag should be 'true', or leave 'false')
-*/
 
 def call(Map pipelineParams) {
 
     pipeline {
         agent any   
-	/* triggers {
-		pollSCM 'H/5 * * * *'
-	      }*/
         parameters {
             choice(name: 'Build_Type', choices: "BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release", description: 'Select the Build type' )
            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release', )
