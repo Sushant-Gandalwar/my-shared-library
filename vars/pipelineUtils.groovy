@@ -21,7 +21,13 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            // Other stages would follow...
+            post{
+                    failure{
+                        script{
+                            log.error("Intialize code has an error : ${APP_Name}")
+                        }
+                    }
+                }
         }
     }
 }
