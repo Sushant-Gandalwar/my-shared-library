@@ -36,32 +36,28 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('PUBLISH IMAGE') {
-               when {
-                     expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
-               }                        
+            stage('BUILD') {
+            when {
+                expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
+            }            
                 steps {
                     script {
-                        echo "Building docker image and publishing to GCR"
+                        log.info("Running Reload, clean and compile")
                     }
-                    sh "sbt publish"
-                    sh "sbt docker:publishLocal"
-                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
-                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                         
-                         """
-                    }
-
-
+		     sh ''' 
+		          java -version 
+		       	'''
+                    sh "sbt reload && sbt clean && sbt compile"
+		   // sh "sbt dependencyTree"
+                }
+                post {
+                  failure {
                     script {
-                        echo "Published Docker image ${env.IMAGE} to GCR"
-                    }
+                      log.error("Build and compile failed for Service: ${APP_NAME}")
+		         }
+                  }
                 }
             }
-        
         }
     }
 }
