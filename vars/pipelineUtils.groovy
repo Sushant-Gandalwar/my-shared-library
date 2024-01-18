@@ -42,7 +42,7 @@ def call(Map pipelineParams) {
             }            
                 steps {
                     script {
-                        log.info("Running Reload, clean and compile")
+                       echo "Running Reload, clean and compile"
                     }
 		     sh ''' 
 		          java -version 
@@ -53,7 +53,7 @@ def call(Map pipelineParams) {
                 post {
                   failure {
                     script {
-                      log.error("Build and compile failed for Service: ${APP_NAME}")
+                      echo "Build and compile failed for Service: ${APP_NAME}"
 		         }
                   }
                 }
