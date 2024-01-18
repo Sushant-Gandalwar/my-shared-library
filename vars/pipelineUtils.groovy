@@ -24,7 +24,7 @@ def call(Map pipelineParams) {
                 post{
                     failure{
                         script{
-                            log.error("Intialize code has an error : env.APP_Name")
+                            log.error("Intialize code has an error : ${APP_Name}")
                         }
                     }
                 }
