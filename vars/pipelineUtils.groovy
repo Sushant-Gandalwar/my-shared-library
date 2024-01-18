@@ -1,22 +1,19 @@
-def call(Map pipelineParams) {
-   pipeline{
-    agent any 
-       parameters {
-            choice(name: 'Build_Type', choices: "BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release", description: 'Select the Build type' )
-           string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release', )
-        }        
+// vars/MySharedLibrary.groovy
 
+def call(String gitUrl) {
+    pipeline {
+        agent any
         
-
         stages {
-            stage('INITIALIZE') {
+            stage('Initialize') {
                 steps {
-                       script {
+                    script {
                         echo "Git URL: ${gitUrl}"
                         // Additional initialization steps using the Git URL
                     }
-		}
+                }
+            }
+            // Other stages would follow...
         }
-   }
+    }
 }
-
