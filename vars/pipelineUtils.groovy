@@ -17,6 +17,9 @@ def call(Map pipelineParams) {
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
+            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
+            IMAGE = "${pipelineParams.dockerImage}"
+            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -31,33 +34,61 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            echo "Initialization code has an error for ${APP_Name}"
+                            log.error("Initialization code has an error for ${APP_Name}")
                         }
                     }
                 }
             }
-            stage('BUILD') {
-                when {
-                    expression {
-                        params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
-                    }
-                }
+            // stage('BUILD'){
+            //     when{
+            //         expression{
+            //             params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
+            //         }
+            //     }
+            //     steps{
+            //         script{
+            //             log.info("Running Reload, clean and compile")
+            //         }
+            //         sh '''
+            //            java version 
+            //         '''
+
+            //         sh "sbt reload"
+            //         sh "sbt clean"
+            //         sh "sbt compile"
+
+
+            //     }
+            //     post {
+            //         failure {
+            //             script {
+            //                 log.error("Initialization code has an error for ${APP_Name}")
+            //             }
+            //         }
+            //     }
+            // }
+             stage('PUBLISH IMAGE') {
+               when {
+                     expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
+               }                        
                 steps {
                     script {
-                        echo "Running Reload, clean, and compile"
+                        log.info("Building docker image and publishing to GCR")
                     }
-                    sh '''
-                        java -version
-                    '''
-                    sh "sbt reload"
-                    sh "sbt clean"
-                    sh "sbt compile"
-                }
-                post {
-                    failure {
-                        script {
-                            echo "Build stage has an error for ${APP_Name}"
-                        }
+                    sh "sbt publish"
+                    sh "sbt docker:publishLocal"
+                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/orgs"]) {
+                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                      sh """
+                         docker push '${env.IMAGE}:${env.IMAGETAG}'
+                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
+                         
+                         """
+                    }
+
+
+                    script {
+                        log.info("Published Docker image ${env.IMAGE} to GCR")
                     }
                 }
             }
