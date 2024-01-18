@@ -15,11 +15,13 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        log.info("Initializing environment for webstore delivery pipeline")
+                        echo "Initializing environment for webstore delivery pipeline"
                         echo "Git URL: ${env.scmUrl}"
+                        // Other initialization steps...
                     }
                 }
             }
+            // Other stages would follow...
         }
     }
 }
