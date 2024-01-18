@@ -31,7 +31,7 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            echo "Initialization code has an error for ${APP_Name}"
+                            log.error("Initialization code has an error for ${APP_Name}")
                         }
                     }
                 }
@@ -39,7 +39,7 @@ def call(Map pipelineParams) {
             stage('BUILD'){
                 when{
                     expression{
-                        parameters.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
+                        params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
                     }
                 }
                 steps{
@@ -59,7 +59,7 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            echo "Initialization code has an error for ${APP_Name}"
+                            log.error("Initialization code has an error for ${APP_Name}")
                         }
                     }
                 }
