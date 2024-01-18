@@ -8,6 +8,7 @@ def call(Map pipelineParams) {
 
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
+            APP_Name = "${pipelineParams.appName}"
             }
 
 
@@ -19,8 +20,16 @@ def call(Map pipelineParams) {
                     
                    }
                 }
+                post{
+                    failure{
+                        script{
+                            log.error("Intialize code has an error : env.APP_Name")
+                        }
+                    }
+                }
             }
         }
    }
 }
 
+}
