@@ -1,6 +1,4 @@
 def call(Map pipelineParams) {
-    def log
-
     pipeline {
         agent any
         parameters {
@@ -29,6 +27,7 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
+                        def log =  new LogWrapper(currentBuild.rawBuild.logger)  // Initialize log
                         log.info("Initializing environment for webstore delivery pipeline")
                         log.info("Git URL: ${env.scmUrl}")
                     }
@@ -36,6 +35,7 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
+                            def log =  new LogWrapper(currentBuild.rawBuild.logger)  // Initialize log
                             log.error("Initialization code has an error for ${APP_Name}")
                         }
                     }
@@ -48,6 +48,7 @@ def call(Map pipelineParams) {
                 }
                 steps {
                     script {
+                        def log =  new LogWrapper(currentBuild.rawBuild.logger)  // Initialize log
                         log.info("Building docker image and publishing to GCR")
                     }
                     sh "sbt publish"
@@ -61,6 +62,7 @@ def call(Map pipelineParams) {
                     }
 
                     script {
+                        def log =  new LogWrapper(currentBuild.rawBuild.logger)  // Initialize log
                         log.info("Published Docker image ${env.IMAGE} to GCR")
                     }
                 }
