@@ -63,30 +63,29 @@ def call(Map pipelineParams) {
                   }
                 }
             }
-            stage('PUBLISH IMAGE') {
+            stage('BUILD IMAGE') {
     when {
         expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
     }
     steps {
         script {
-            echo "Building docker image and publishing to GCR"
+            echo "Building Docker image"
         }
 
-        // Ensure that sbt and Docker are installed
+        // Ensure that sbt is installed
         sh 'sbt clean compile'
 
         // Publish the Docker image locally using sbt
         sh 'sbt docker:publishLocal'
 
-        // Build and push the Docker image to GCR
-       
-            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-          
+        script {
+            echo "Built Docker image locally"
+        }
     }
     post {
         failure {
             script {
-                echo "Failed to build and publish Docker image."
+                echo "Failed to build Docker image."
             }
         }
     }
