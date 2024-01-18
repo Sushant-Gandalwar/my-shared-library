@@ -1,4 +1,6 @@
 def call(Map pipelineParams) {
+    def log
+
     pipeline {
         agent any
         parameters {
@@ -20,15 +22,15 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            IMAGE_TAG = "${params.Parameter}"
         }
 
         stages {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        echo "Initializing environment for webstore delivery pipeline"
-                        echo "Git URL: ${env.scmUrl}"
-                        
+                        log.info("Initializing environment for webstore delivery pipeline")
+                        log.info("Git URL: ${env.scmUrl}")
                     }
                 }
                 post {
@@ -39,38 +41,11 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            // stage('BUILD'){
-            //     when{
-            //         expression{
-            //             params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
-            //         }
-            //     }
-            //     steps{
-            //         script{
-            //             log.info("Running Reload, clean and compile")
-            //         }
-            //         sh '''
-            //            java version 
-            //         '''
 
-            //         sh "sbt reload"
-            //         sh "sbt clean"
-            //         sh "sbt compile"
-
-
-            //     }
-            //     post {
-            //         failure {
-            //             script {
-            //                 log.error("Initialization code has an error for ${APP_Name}")
-            //             }
-            //         }
-            //     }
-            // }
-             stage('PUBLISH IMAGE') {
-               when {
-                     expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
-               }                        
+            stage('PUBLISH IMAGE') {
+                when {
+                    expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
+                }
                 steps {
                     script {
                         log.info("Building docker image and publishing to GCR")
@@ -78,14 +53,12 @@ def call(Map pipelineParams) {
                     sh "sbt publish"
                     sh "sbt docker:publishLocal"
                     withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/orgs"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
-                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                         
-                         """
+                        sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                        sh """
+                           docker push '${env.IMAGE}:${env.IMAGETAG}'
+                           docker rmi '${env.IMAGE}:${env.IMAGETAG}'
+                        """
                     }
-
 
                     script {
                         log.info("Published Docker image ${env.IMAGE} to GCR")
