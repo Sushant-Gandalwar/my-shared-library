@@ -38,7 +38,9 @@ def call(Map pipelineParams) {
             }
             stage('BUILD'){
                 when{
-                    parameters.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
+                    expression{
+                        parameters.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
+                    }
                 }
                 steps{
                     script{
