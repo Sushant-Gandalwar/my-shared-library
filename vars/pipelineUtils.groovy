@@ -31,35 +31,32 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            log.error("Initialization code has an error for ${APP_Name}")
+                            echo "Initialization code has an error for ${APP_Name}"
                         }
                     }
                 }
             }
-            stage('BUILD'){
-                when{
-                    expression{
+            stage('BUILD') {
+                when {
+                    expression {
                         params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot'
                     }
                 }
-                steps{
-                    script{
-                        log.info("Running Reload, clean and compile")
+                steps {
+                    script {
+                        echo "Running Reload, clean, and compile"
                     }
                     sh '''
-                       java version 
+                        java -version
                     '''
-
                     sh "sbt reload"
                     sh "sbt clean"
                     sh "sbt compile"
-
-
                 }
                 post {
                     failure {
                         script {
-                            log.error("Initialization code has an error for ${APP_Name}")
+                            echo "Build stage has an error for ${APP_Name}"
                         }
                     }
                 }
