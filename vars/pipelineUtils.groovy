@@ -8,15 +8,9 @@ def call(Map pipelineParams) {
 
         environment {
             APP_NAME = "${pipelineParams.appName}"
-            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            IMAGE = "${pipelineParams.dockerImage}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-            DB_CREDS_ID = "${pipelineParams.databaseCredentialsId}"
             IMAGE_TAG = "${params.Parameter}"
             COMMAND = "${params.Parameter}"
 	        BRANCH =  "${pipelineParams.branch}"
-	        EMAIL = "cicd-admin@aienterprise.com"
-	        USERNAME = "cicd-admin-aie"
             }
 
 
@@ -26,9 +20,8 @@ def call(Map pipelineParams) {
                     script {
                         log.info("Initializing environment for webstore delivery pipeline")
                         echo 'Start Initializing!'
-                        valuesYaml = loadValuesYaml()
                         git branch: pipelineParams.branch,url: pipelineParams.scmUrl                  
-                          if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'master') {
+                          if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
                           env.PACKAGE_VERSION = sh(
                                script: """
                                  set +x
@@ -38,21 +31,7 @@ def call(Map pipelineParams) {
                                ).trim()
 
                           env.IMAGETAG = 'v' + env.PACKAGE_VERSION + '-' + env.BUILD_NUMBER
-                        } else if (env.IMAGE_TAG != 'default' && pipelineParams.branch == 'master') {
-                              env.IMAGETAG = env.IMAGE_TAG
-                       }  else if (env.IMAGE_TAG == 'default') {
-                          env.GIT_COMMIT_ID = sh(
-                               script: """
-                                 set +x
-                                 git log -1 --pretty=%h
-                               """,
-                               returnStdout: true
-                               ).trim()
-                          env.IMAGETAG = 'v' + env.GIT_COMMIT_ID + '-' + env.BUILD_NUMBER                       
-                       
-                       }  else {
-                          env.IMAGETAG = env.IMAGE_TAG
-                        }                        
+                        }                      
                     }
                 }
             }
@@ -60,8 +39,3 @@ def call(Map pipelineParams) {
    }
 }
 
-def loadValuesYaml() {
-
-         def valuesYaml = readYaml (file: '/var/lib/jenkins/devops/env_properties.yaml')
-  	 return valuesYaml;
-}
