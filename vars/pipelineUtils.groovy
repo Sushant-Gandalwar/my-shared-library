@@ -3,7 +3,7 @@ def call(Map pipelineParams) {
         agent any
         parameters {
             choice(name: 'Build_Type', choices: "BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release", description: 'Select the Build type')
-            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release',)
+            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosing DEPLOY_ONLY OR pass the sbt release command if choosing Publish_to_Release',)
         }
 
         environment {
@@ -21,13 +21,14 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            post{
-                    failure{
-                        script{
-                            log.error("Intialize code has an error : ${APP_Name}")
-                        }
-                    }
+        }
+
+        post {
+            failure {
+                script {
+                    echo "Initialization code has an error for ${APP_Name}"
                 }
+            }
         }
     }
 }
