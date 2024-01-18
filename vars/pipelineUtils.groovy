@@ -63,31 +63,34 @@ def call(Map pipelineParams) {
                   }
                 }
             }
-            stage('PUBLISH IMAGE') {
-               when {
-                     expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
-               }                        
-                steps {
-                    script {
-                        log.info("Building docker image and publishing to GCR")
-                    }
-                    sh "sbt publish"
-                    sh "sbt docker:publishLocal"
-                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "docker.io"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
-                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                         
-                         """
-                    }
+            stage('BUILD IMAGE') {
+    when {
+        expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
+    }
+    steps {
+        script {
+            echo "Building Docker image"
+        }
 
+        // Ensure that sbt is installed
+        sh 'sbt clean compile'
 
-                    script {
-                        log.info("Published Docker image ${env.IMAGE} to GCR")
-                    }
-                }
+        // Publish the Docker image locally using sbt
+        sh 'sbt docker:publishLocal'
+
+        script {
+            echo "Built Docker image locally"
+
+        }
+    }
+    post {
+        failure {
+            script {
+                echo "Failed to build Docker image."
             }
+        }
+    }
+}
 
         }
     }
