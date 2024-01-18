@@ -79,7 +79,9 @@ def call(Map pipelineParams) {
         sh 'sbt docker:publishLocal'
 
         script {
-            echo "Built Docker image locally"
+            // echo "Built Docker image locally"
+            sh "docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+
         }
     }
     post {
