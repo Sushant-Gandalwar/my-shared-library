@@ -20,6 +20,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            CREDENTIALS_PASS = "${pipelineParams.dockerCredentialsPass}"
             // DB_CREDS_ID = "${pipelineParams.databaseCredentialsId}"
             IMAGE_TAG = "${params.Parameter}"
         }
@@ -78,10 +79,26 @@ def call(Map pipelineParams) {
         // Publish the Docker image locally using sbt
         sh 'sbt docker:publishLocal'
 
-        script {
-            echo "Built Docker image locally"
+        withDockerRegistry([credentialsId: "dockerhub-credentials", url: "https://index.docker.io/v1/"]) {
+    // Change to the Docker directory
+    dir("${env.DOCKERDIRECTORY}") {
+        // Build the Docker image
+        sh "docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
 
-        }
+        // Log in to Docker Hub (using credentials)
+        sh "docker login -u ${env.credentialsId} -p ${env.credentialsPass}"
+
+        // Push the Docker image to Docker Hub
+        sh "docker push '${env.IMAGE}:${env.IMAGETAG}'"
+
+        // Log out from Docker Hub
+        sh "docker logout"
+
+        // Remove the local Docker image (optional)
+        sh "docker rmi '${env.IMAGE}:${env.IMAGETAG}'"
+    }
+}
+
     }
     post {
         failure {
