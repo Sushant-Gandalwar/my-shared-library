@@ -25,6 +25,16 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+            stage('build image') 
+            {
+                steps 
+                {
+                    script 
+                    {
+                        sh 'docker build -t jaydeep .'
+                    }
+                }
+            }
             
           
         }
