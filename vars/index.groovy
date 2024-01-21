@@ -33,8 +33,7 @@ def call(Map pipelineParams) {
                     script {
                         echo "Building docker image and publishing to GCR"
                     }
-                    sh "sbt publish"
-                    sh "sbt docker:publishLocal"
+                   
                     
                     // Build and push Docker image to GCR
                     withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
