@@ -32,7 +32,7 @@ def call(Map pipelineParams) {
                     script {
                         // Build the Docker image
                         dir(env.DOCKERDIRECTORY) {
-                            sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
+                            sh "docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
                         }
 
                         // Login to Docker Hub
@@ -41,10 +41,10 @@ def call(Map pipelineParams) {
                         }
 
                         // Tag the Docker image
-                        sh "docker tag ${env.APP_Name}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:${env.IMAGE_TAG}"
+                        sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
 
                         // Push the Docker image to Docker Hub
-                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:${env.IMAGE_TAG}"
+                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
                     }
                 }
             }
