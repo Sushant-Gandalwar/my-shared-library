@@ -74,15 +74,7 @@ def call(Map pipelineParams) {
                     }
                     sh "sbt publish"
                     sh "sbt docker:publishLocal"
-                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
-                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                         
-                         """
-                    }
-
+                    
 
                     script {
                         echo "Published Docker image ${env.IMAGE} to GCR"
