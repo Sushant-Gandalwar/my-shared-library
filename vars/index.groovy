@@ -41,7 +41,7 @@ def call(Map pipelineParams) {
                             sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
 
                             // Tag the Docker image
-                            sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
+                            sh "docker tag ${env.DOCKER_IMAGE_NAME} ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}"
 
                             // Push the Docker image to Docker Hub
                             // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
