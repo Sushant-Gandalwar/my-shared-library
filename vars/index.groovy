@@ -1,11 +1,10 @@
 def call(Map pipelineParams) {
     pipeline {
         agent any
-        
 
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
-            
+            APP_Name = "${pipelineParams.appName}"
         }
 
         stages {
@@ -14,7 +13,6 @@ def call(Map pipelineParams) {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
                         echo "Git URL: ${env.scmUrl}"
-                        
                     }
                 }
                 post {
@@ -25,21 +23,23 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('build image') 
-            {
-                steps 
-                {
-                    script 
-                    {
+            stage('Build and Push Docker Image') {
+                steps {
+                    script {
+                        // Build the Docker image
                         sh 'docker build -t jaydeep .'
-                        sh 'docker login'
+
+                        // Login to Docker Hub
+                        sh 'docker login -u sushantgandalwar -p Sush900123@'
+
+                        // Tag the Docker image
                         sh 'docker tag jaydeep sushantgandalwar/hello-world-html:latest'
+
+                        // Push the Docker image to Docker Hub
                         sh 'docker push sushantgandalwar/hello-world-html:latest'
                     }
                 }
             }
-            
-          
         }
     }
 }
