@@ -33,27 +33,15 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         dir(env.DOCKERDIRECTORY) {
-                            // sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
+                            // Build the Docker image
                             sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+
+                            // Login to Docker Hub and push the image
+                            withCredentials([usernamePassword(credentialsId: env.CREDENTIALS_ID, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                                sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin"
+                                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                            }
                         }
-
-                        withCredentials([usernamePassword(credentialsId: env.CREDENTIALS_ID, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                            sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
-
-                            // Tag the Docker image
-                            sh "docker tag ${env.DOCKER_IMAGE_NAME} ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}"
-
-                            // Push the Docker image to Docker Hub
-                            sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}"
-                        }
-                        // Build the Docker image
-                        // sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
-
-                        // Login to Docker Hub
-                        // sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
-
-                        // Push the Docker image to Docker Hub
-                        // sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     }
                 }
             }
