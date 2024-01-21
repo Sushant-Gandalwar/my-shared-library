@@ -9,6 +9,7 @@ def call(Map pipelineParams) {
             DOCKER_HUB_USERNAME = 'sushant900123'
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
+            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -34,6 +35,16 @@ def call(Map pipelineParams) {
                         dir(env.DOCKERDIRECTORY) {
                             // sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
                             sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+                        }
+
+                        withCredentials([usernamePassword(credentialsId: env.CREDENTIALS_ID, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                            sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+
+                            // Tag the Docker image
+                            sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
+
+                            // Push the Docker image to Docker Hub
+                            // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
                         }
                         // Build the Docker image
                         // sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
