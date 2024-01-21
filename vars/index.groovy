@@ -34,7 +34,6 @@ def call(Map pipelineParams) {
                         dir(env.DOCKERDIRECTORY) {
                             sh "docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
                         }
-
                         // Login to Docker Hub
                         // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
 
