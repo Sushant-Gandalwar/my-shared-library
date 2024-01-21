@@ -33,7 +33,7 @@ def call(Map pipelineParams) {
                     script {
                         // Build the Docker image
                         dir(env.DOCKERDIRECTORY) {
-                            sh "docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
+                            sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
                         }
 
                         // Login to Docker Hub
