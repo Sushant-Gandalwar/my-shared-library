@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE_TAG = "${params.Parameter}"
             IMAGE = "${pipelineParams.dockerImage}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            DOCKER_HUB_CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -34,9 +34,9 @@ def call(Map pipelineParams) {
                         dir(env.DOCKERDIRECTORY) {
                             sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
                         }
-                                               	
-	sh 'echo $CREDENTIALS_ID_PSW | sudo docker login -u $CREDENTIALS_ID_USR --password-stdin'                		
-	echo 'Login Completed'   
+                         withCredentials([string(credentialsId: env.DOCKER_HUB_CREDENTIALS_ID, variable: 'DOCKER_HUB_CREDENTIALS')]) {
+                            sh "echo ${DOCKER_HUB_CREDENTIALS} | docker login -u sushantgandalwar --password-stdin"
+                        }
 
                         // Login to Docker Hub
                         // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
