@@ -32,6 +32,7 @@ def call(Map pipelineParams) {
                     script 
                     {
                         sh 'docker build -t jaydeep .'
+                        sh 'docker run -p 3000:3000 jaydeep'
                     }
                 }
             }
