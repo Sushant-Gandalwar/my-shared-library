@@ -8,8 +8,8 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE_TAG = "${params.Parameter}"
             IMAGE = "${pipelineParams.dockerImage}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-            
+            DOCKER_HUB_USERNAME = "your_docker_hub_username"
+            DOCKER_HUB_PASSWORD = "your_docker_hub_password"
         }
 
         stages {
@@ -23,7 +23,7 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            echo "Initialization code has an error for ${APP_Name}"
+                            log.error("Initialization code has an error for ${APP_Name}")
                         }
                     }
                 }
@@ -31,21 +31,10 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.APP_Name}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.APP_Name}:${env.IMAGETAG}'
-                         docker rmi '${env.APP_Name}:${env.IMAGETAG}'
-                         
-                         """
-                    }
-                    script {
-                        echo "Published Docker image ${env.APP_Name} to GCR"
-                    }
                         // Build the Docker image
-                        // dir(env.DOCKERDIRECTORY) {
-                        //     sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
-                        // }
+                        dir(env.DOCKERDIRECTORY) {
+                            sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
+                        }
 
                         // Login to Docker Hub
                         // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
