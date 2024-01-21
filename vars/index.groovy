@@ -6,6 +6,8 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
+            IMAGE_TAG = "${params.Parameter}"
+            IMAGE = "${pipelineParams.dockerImage}"
         }
 
         stages {
@@ -28,7 +30,8 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Build the Docker image
-                        sh 'docker build -t ${DOCKERDIRECTORY} .'
+                        sh 'cd ${env.DOCKERDIRECTORY}'
+                        sh "docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
 
                         // Login to Docker Hub
                         // sh 'docker login -u sushant900123 -p Sush900123@'
