@@ -8,6 +8,8 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE_TAG = "${params.Parameter}"
             IMAGE = "${pipelineParams.dockerImage}"
+            DOCKER_HUB_USERNAME = "your_docker_hub_username"
+            DOCKER_HUB_PASSWORD = "your_docker_hub_password"
         }
 
         stages {
@@ -30,22 +32,21 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Build the Docker image
-                        sh 'cd ${env.DOCKERDIRECTORY}'
-                        sh "docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                        dir(env.DOCKERDIRECTORY) {
+                            sh "docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
+                        }
 
                         // Login to Docker Hub
-                        // sh 'docker login -u sushant900123 -p Sush900123@'
+                        // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
 
                         // Tag the Docker image
-                        // sh 'docker tag jaydeep sushant900123/hello-world-html:latest'
+                        // sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
 
                         // Push the Docker image to Docker Hub
-                        // sh 'docker push sushant900123/hello-world-html:latest'
+                        // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
                     }
                 }
             }
         }
-
-
     }
 }
