@@ -47,11 +47,11 @@ def call(Map pipelineParams) {
             }
              stage('ARC-DEV APPROVAL') {
                  when {
-                    expression { pipelineParams.branch != 'master' }
+                    expression { pipelineParams.branch != 'development' }
                 }                  
                 steps {
                     script {
-                        log.warn("Approval is required to perform deployment in DEV, Click 'Proceed or Abort'")
+                        echo "Approval is required to perform deployment in DEV, Click 'Proceed or Abort'"
                     }
 
                     timeout(time: 2, unit: 'HOURS') {
