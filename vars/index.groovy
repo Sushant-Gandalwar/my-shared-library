@@ -30,8 +30,12 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
+                        dir(env.DOCKERDIRECTORY) {
+                            // sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
+                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+                        }
                         // Build the Docker image
-                        sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                        // sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
 
                         // Login to Docker Hub
                         // sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
