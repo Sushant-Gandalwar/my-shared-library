@@ -45,7 +45,7 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-             stage('ARC-DEV APPROVAL') {
+            stage('ARC-DEV APPROVAL') {
                  when {
                     expression { pipelineParams.branch != 'development' }
                 }                  
@@ -57,6 +57,17 @@ def call(Map pipelineParams) {
                     timeout(time: 2, unit: 'HOURS') {
 		      verifybuild()
                     }
+                }               
+            }
+             stage('CONTAINER') {
+                                 
+                steps {
+                    script {
+                        sh "docker run -p 8085:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                        
+                    }
+
+                    
                 }               
             }
         }
