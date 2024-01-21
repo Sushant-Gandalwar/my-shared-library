@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE_TAG = "${params.Parameter}"
             IMAGE = "${pipelineParams.dockerImage}"
-            DOCKER_HUB_CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -34,10 +34,15 @@ def call(Map pipelineParams) {
                         dir(env.DOCKERDIRECTORY) {
                             sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
                         }
-                         withCredentials([string(credentialsId: env.DOCKER_HUB_CREDENTIALS_ID, variable: 'DOCKER_HUB_CREDENTIALS')]) {
-                            sh "echo ${DOCKER_HUB_CREDENTIALS} | docker login -u sushantgandalwar --password-stdin"
-                        }
+                        //  withCredentials([string(credentialsId: env.DOCKER_HUB_CREDENTIALS_ID, variable: 'DOCKER_HUB_CREDENTIALS')]) {
+                        //     sh "echo ${DOCKER_HUB_CREDENTIALS} | docker login -u sushantgandalwar --password-stdin"
+                        // }
 
+                          withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/"]) {
+                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                          }
+
+                       
                         // Login to Docker Hub
                         // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
 
