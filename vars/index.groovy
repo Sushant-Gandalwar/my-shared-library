@@ -27,7 +27,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Build the Docker image
-                        sh 'docker build -t ${IMAGE} .'
+                        sh 'docker build -t jaydeep .'
 
                         // Login to Docker Hub
                         sh 'docker login -u sushant900123 -p Sush900123@'
