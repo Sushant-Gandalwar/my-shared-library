@@ -37,7 +37,7 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            log.error("Initialization code has an error for ${APP_Name}")
+                            echo "Initialization code has an error for ${APP_Name}"
                         }
                     }
                 }
@@ -70,7 +70,7 @@ def call(Map pipelineParams) {
                }                        
                 steps {
                     script {
-                        log.info("Building docker image and publishing to GCR")
+                        echo "Building docker image and publishing to GCR"
                     }
                     sh "sbt publish"
                     sh "sbt docker:publishLocal"
@@ -85,7 +85,7 @@ def call(Map pipelineParams) {
 
 
                     script {
-                        log.info("Published Docker image ${env.IMAGE} to GCR")
+                        echo "Published Docker image ${env.IMAGE} to GCR"
                     }
                 }
             }
