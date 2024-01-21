@@ -44,7 +44,7 @@ def call(Map pipelineParams) {
                             sh "docker tag ${env.DOCKER_IMAGE_NAME} ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}"
 
                             // Push the Docker image to Docker Hub
-                            // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.IMAGE}:${env.IMAGE_TAG}"
+                            sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}"
                         }
                         // Build the Docker image
                         // sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
