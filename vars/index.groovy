@@ -36,13 +36,15 @@ def call(Map pipelineParams) {
                         }
 
                         // Login to Docker Hub
-                        sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
+                        withCredentials([usernamePassword(credentialsId: env.CREDENTIALS_ID, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                            sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+                        }
 
                         // Tag the Docker image
-                        sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
+                        sh "docker tag ${env.APP_Name}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:${env.IMAGE_TAG}"
 
                         // Push the Docker image to Docker Hub
-                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
+                        sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:${env.IMAGE_TAG}"
                     }
                 }
             }
