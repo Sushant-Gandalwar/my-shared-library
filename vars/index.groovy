@@ -5,10 +5,9 @@ def call(Map pipelineParams) {
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
-            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            IMAGE_TAG = "${params.Parameter}"
-            IMAGE = "${pipelineParams.dockerImage}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            DOCKER_HUB_USERNAME = 'sushant900123'
+            DOCKER_IMAGE_NAME = 'hello-world-html'
+            DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
         }
 
         stages {
@@ -27,21 +26,18 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+
             stage('Build and Push Docker Image') {
                 steps {
                     script {
                         // Build the Docker image
-                        dir(env.DOCKERDIRECTORY) {
-                            sh "docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
-                        }
-                        // Login to Docker Hub
-                        // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
+                        sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
 
-                        // Tag the Docker image
-                        // sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
+                        // Login to Docker Hub
+                        sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
 
                         // Push the Docker image to Docker Hub
-                        // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
+                        sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
                     }
                 }
             }
