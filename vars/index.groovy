@@ -5,6 +5,7 @@ def call(Map pipelineParams) {
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
+            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             DOCKER_HUB_USERNAME = 'sushant900123'
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
