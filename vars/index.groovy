@@ -8,8 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE_TAG = "${params.Parameter}"
             IMAGE = "${pipelineParams.dockerImage}"
-            DOCKER_HUB_USERNAME = "your_docker_hub_username"
-            DOCKER_HUB_PASSWORD = "your_docker_hub_password"
+            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -23,27 +22,29 @@ def call(Map pipelineParams) {
                 post {
                     failure {
                         script {
-                            log.error("Initialization code has an error for ${APP_Name}")
+                            echo "Initialization code has an error for ${APP_Name}"
                         }
                     }
                 }
             }
-            stage('Build and Push Docker Image') {
+
+            stage('Build and Publish to GCR') {
                 steps {
                     script {
-                        // Build the Docker image
-                        dir(env.DOCKERDIRECTORY) {
-                            sh "docker build -t ${env.APP_Name}:${env.IMAGE_TAG} -f Dockerfile ."
-                        }
+                        echo "Building docker image and publishing to GCR"
+                    }
+                    sh "sbt publish"
+                    sh "sbt docker:publishLocal"
+                    
+                    // Build and push Docker image to GCR
+                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                        sh "cd ${env.DOCKERDIRECTORY} && docker build -t ${env.IMAGE}:${env.IMAGE_TAG} -f Dockerfile ."
+                        sh "docker push ${env.IMAGE}:${env.IMAGE_TAG}"
+                        sh "docker rmi ${env.IMAGE}:${env.IMAGE_TAG}"
+                    }
 
-                        // Login to Docker Hub
-                        // sh "docker login -u ${env.DOCKER_HUB_USERNAME} -p ${env.DOCKER_HUB_PASSWORD}"
-
-                        // Tag the Docker image
-                        // sh "docker tag ${env.IMAGE}:${env.IMAGE_TAG} ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
-
-                        // Push the Docker image to Docker Hub
-                        // sh "docker push ${env.DOCKER_HUB_USERNAME}/${env.APP_Name}:latest"
+                    script {
+                        echo "Published Docker image ${env.IMAGE}:${env.IMAGE_TAG} to GCR"
                     }
                 }
             }
