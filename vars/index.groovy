@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = 'hello-world-html'
             IMAGETAG = 'latest' // You can parameterize this based on your needs
-            CREDENTIALS_ID = '404b3183-6431-48ad-b984-2316e79f2cfd'
+            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
         stages {
@@ -34,7 +34,7 @@ def call(Map pipelineParams) {
                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                       sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                       sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
+                         docker push jenkins-407204/'${env.IMAGE}:${env.IMAGETAG}'
                         
                          
                          """
@@ -42,6 +42,17 @@ def call(Map pipelineParams) {
                     }
                     
                 }
+            }
+            stage('CONTAINER') {
+                                 
+                steps {
+                    script {
+                        sh "docker run -p 8086:3000 ${env.IMAGE}:${env.IMAGETAG}"
+                        
+                    }
+
+                    
+                }    
             }
         }
     }
