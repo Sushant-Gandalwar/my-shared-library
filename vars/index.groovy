@@ -32,7 +32,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                     withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}",url: "https://gcr.io"]) {
-                       echo "gcr:${env.CREDENTIALS_ID}"
+                       echo "hello done sushant"
                      }
                     }
                     
