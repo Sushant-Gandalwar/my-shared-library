@@ -33,10 +33,12 @@ def call(Map pipelineParams) {
                     script {
                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                       sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                        sh "docker push gcr.io/${env.CREDENTIALS_ID}/${env.IMAGE}:${env.IMAGETAG}"
-                         
-                         """
+                      def pushCommand = "docker push gcr.io/${env.CREDENTIALS_ID}/${env.IMAGE}:${env.IMAGETAG}"
+                def pushStatus = sh(script: pushCommand, returnStatus: true)
+
+                if (pushStatus != 0) {
+                    error("Failed to push Docker image to the registry")
+                }
                     }
                     }
                     
