@@ -33,12 +33,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                          withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/repositories/sushant900123"]) {
-                              sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                              sh """
-                                    docker push '${env.IMAGE}:${env.IMAGETAG}'
-                                    docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                                    
-                                """
+                              echo "hello"
                     }
                 }
             }
@@ -47,3 +42,11 @@ def call(Map pipelineParams) {
 }
 
 
+
+
+// sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+//                               sh """
+//                                     docker push '${env.IMAGE}:${env.IMAGETAG}'
+//                                     docker rmi '${env.IMAGE}:${env.IMAGETAG}'
+                                    
+//                                 """
