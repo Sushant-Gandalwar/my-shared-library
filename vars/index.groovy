@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
-            DOCKERHUB_CREDENTIALS = 'your-dockerhub-credentials-id' // Replace with your Docker Hub credentials ID
+            DOCKERHUB_CREDENTIALS = 'env.dockerCredentialsId' // Replace with your Docker Hub credentials ID
         }
 
         stages {
