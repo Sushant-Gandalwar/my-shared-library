@@ -6,8 +6,8 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            IMAGE = 'hello-world-html'
-            IMAGETAG = 'latest' // You can parameterize this based on your needs
+            DOCKER_IMAGE_NAME = 'hello-world-html'
+            DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
             CREDENTIALS_ID = '404b3183-6431-48ad-b984-2316e79f2cfd'
         }
 
@@ -33,12 +33,11 @@ def call(Map pipelineParams) {
                     script {
                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                       sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      def pushCommand = "docker push gcr.io/${env.CREDENTIALS_ID}/${env.IMAGE}:${env.IMAGETAG}"
-                def pushStatus = sh(script: pushCommand, returnStatus: true)
-
-                if (pushStatus != 0) {
-                    error("Failed to push Docker image to the registry")
-                }
+                      sh """
+                         docker push '${env.IMAGE}:${env.IMAGETAG}'
+                        
+                         
+                         """
                     }
                     }
                     
