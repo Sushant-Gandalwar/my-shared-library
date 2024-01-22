@@ -54,6 +54,9 @@ def call(Map pipelineParams) {
             }
 
             stage('CONTAINER') {
+                when {
+                    expression { env.releaseskip != 'dorelease' }
+                }
                 steps {
                     script {
                         sh "docker run -p 8085:8000 ${env.IMAGE}:${env.IMAGETAG}"
