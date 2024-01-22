@@ -31,7 +31,7 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                     docker.withRegistry( 'https://gcr.io', "gcr:${ID}" ) {
+                     docker.withRegistry( 'https://gcr.io', "gcr:${CREDENTIALS_ID}" ) {
                             echo "hello"
                         }
                     }
