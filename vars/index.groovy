@@ -68,7 +68,7 @@ def call(Map pipelineParams) {
 def verifybuild() {
     def userInput = input(
         id: 'userInput', message: 'Approve Deployment!', parameters: [
-            [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'click to skip', name: 'skip'],
+            [$class: 'BooleanParameterDefinition', defaultValue: false],
         ])
 
     if (!userInput) {
