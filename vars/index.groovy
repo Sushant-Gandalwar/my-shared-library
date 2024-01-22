@@ -32,21 +32,22 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://hub.docker.com/repositories/sushant900123"]) {
-                              echo "hello"
+                        dir(env.DOCKERDIRECTORY) {
+                            // Build the Docker image
+                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+
+                            // Login to Docker Hub and push the image
+                            // withCredentials([usernamePassword(credentialsId: env.CREDENTIALS_ID, usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                            //     sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin"
+                            //     sh "docker push ${DOCKER_HUB_USERNAME}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                            // }
+                        }
                     }
                 }
             }
+
         }
     }
 }
 
 
-
-
-// sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-//                               sh """
-//                                     docker push '${env.IMAGE}:${env.IMAGETAG}'
-//                                     docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                                    
-//                                 """
