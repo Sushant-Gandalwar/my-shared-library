@@ -43,7 +43,7 @@ def call(Map pipelineParams) {
                                  
                 steps {
                     script {
-                        sh "docker run -p 8086:3000 ${env.IMAGE}:${env.IMAGETAG}"
+                        sh "docker run -p 8085:8000 ${env.IMAGE}:${env.IMAGETAG}"
                         
                     }
 
