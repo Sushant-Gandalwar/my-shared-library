@@ -32,8 +32,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                     docker.withRegistry('https://eu.gcr.io', 'gcr:[CREDENTIALS_ID]') {
-    app.push("${env.BUILD_NUMBER}")
-    app.push("latest")
+                        echo "hello"
   }
                     }
                     
