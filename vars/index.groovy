@@ -55,7 +55,7 @@ def call(Map pipelineParams) {
 
             stage('CONTAINER') {
                 when {
-                    expression { env.releaseskip != 'dorelease' }
+                    expression { env.releaseskip == 'proceed' }
                 }
                 steps {
                     script {
@@ -74,8 +74,8 @@ def verifybuild() {
         ])
 
     if (!userInput) {
-        env.releaseskip = 'dorelease'
+        env.releaseskip = 'abort'
     } else {
-        env.releaseskip = 'norelease'
+        env.releaseskip = 'proceed'
     }
 }
