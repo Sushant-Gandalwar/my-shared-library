@@ -6,11 +6,9 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            DOCKER_HUB_USERNAME = 'sushant900123'
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-            GCR_URL = "gcr.io/${projectID}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+            DOCKERHUB_CREDENTIALS = 'your-dockerhub-credentials-id' // Replace with your Docker Hub credentials ID
         }
 
         stages {
@@ -33,10 +31,15 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t ${env.GCR_URL} -f Dockerfile ."
-                            sh "docker push ${env.GCR_URL}"
-                            sh "docker rmi ${env.GCR_URL}"
+                        dir(env.DOCKERDIRECTORY) {
+                            // Build the Docker image
+                            sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
+
+                            // Push the Docker image to Docker Hub
+                            withDockerRegistry([credentialsId: "${DOCKERHUB_CREDENTIALS}", url: "https://index.docker.io/v1/"]) {
+                                sh "docker login -u _json_key -p \$(cat \${DOCKERHUB_CREDENTIALS}_json_key.json) https://index.docker.io/v1/"
+                                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                            }
                         }
                     }
                 }
