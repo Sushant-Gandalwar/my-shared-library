@@ -39,9 +39,7 @@ def call(Map pipelineParams) {
             }
 
             stage('ARC-DEV APPROVAL') {
-                when {
-                    expression { true } // Always evaluate to true
-                }
+               
                 steps {
                     script {
                         echo "Approval is required to perform deployment in DEV, Click 'Proceed or Abort'"
