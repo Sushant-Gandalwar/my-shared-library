@@ -34,7 +34,7 @@ def call(Map pipelineParams) {
                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                       sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                       sh """
-                        echo "hello"
+                        sh "docker push gcr.io/${env.CREDENTIALS_ID}/${env.IMAGE}:${env.IMAGETAG}"
                          
                          """
                     }
