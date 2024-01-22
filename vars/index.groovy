@@ -31,11 +31,15 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                     docker.withRegistry( 'https://gcr.io', "gcr:${CREDENTIALS_ID}" ) {
-                            echo "hello"
+                        // Build and push Docker image using Google Cloud credentials
+                        withCredentials([googleServiceAccount(credentialsId: CREDENTIALS_ID, 
+                                                            jsonKeyVariable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                            docker.withRegistry('https://gcr.io', 'gcr:${CREDENTIALS_ID}') {
+                                def customImage = docker.build("${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}", "${DOCKERDIRECTORY}")
+                                customImage.push()
+                            }
                         }
                     }
-                    
                 }
             }
         }
