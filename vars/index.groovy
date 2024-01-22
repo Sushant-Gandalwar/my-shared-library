@@ -36,12 +36,16 @@ def call(Map pipelineParams) {
                             sh "docker build -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f Dockerfile ."
 
                             // Push the Docker image to Docker Hub
-                            withDockerRegistry([credentialsId: "${DOCKERHUB_CREDENTIALS}", url: "https://index.docker.io/v1/"]) {
-                                sh "docker login -u _json_key -p \$(cat \${DOCKERHUB_CREDENTIALS}_json_key.json) https://index.docker.io/v1/"
-                                sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                            withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                                withDockerRegistry([credentialsId: "${DOCKERHUB_CREDENTIALS}", url: "https://index.docker.io/v1/"]) {
+                                    sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+                                    sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                                    sh "docker logout"
+                                }
                             }
                         }
                     }
+                    
                 }
             }
         }
