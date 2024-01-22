@@ -8,7 +8,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            CREDENTIALS_ID = 'jenkins-407204'
         }
 
         stages {
