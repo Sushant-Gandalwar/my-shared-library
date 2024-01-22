@@ -31,14 +31,14 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                        // Build the Docker image
-            sh "cd ${env.DOCKERDIRECTORY} && docker build -t ${env.IMAGE}:${env.IMAGETAG} -f Dockerfile ."
-
-            // Log in to the Docker registry
-            sh "docker login -u _token -p 404b3183-6431-48ad-b984-2316e79f2cfd https://gcr.io"
-
-            // Push the Docker image to the registry
-            sh "docker push ${env.IMAGE}:${env.IMAGETAG}"
+                   withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                      sh """
+                         docker push '${env.IMAGE}:${env.IMAGETAG}'
+                        
+                         
+                         """
+                    }
                     }
                     
                 }
