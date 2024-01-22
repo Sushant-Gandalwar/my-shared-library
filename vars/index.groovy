@@ -10,6 +10,7 @@ def call(Map pipelineParams) {
             DOCKER_IMAGE_NAME = 'hello-world-html'
             DOCKER_IMAGE_TAG = 'latest' // You can parameterize this based on your needs
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+            GCR_URL = "gcr.io/${projectID}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
         }
 
         stages {
@@ -33,19 +34,13 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                      sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                      sh """
-                         docker push '${env.IMAGE}:${env.IMAGETAG}'
-                         docker rmi '${env.IMAGE}:${env.IMAGETAG}'
-                         
-                         """
-                    }
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t ${env.GCR_URL} -f Dockerfile ."
+                            sh "docker push ${env.GCR_URL}"
+                            sh "docker rmi ${env.GCR_URL}"
+                        }
                     }
                 }
             }
-
         }
     }
 }
-
-
