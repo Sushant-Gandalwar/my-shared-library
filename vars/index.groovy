@@ -47,7 +47,7 @@ def call(Map pipelineParams) {
             stage('ARC-DEV APPROVAL') {
                 steps {
                     script {
-                        sh "kubectl apply -f ${KUBERNETES_MANIFEST_FILE}"
+                        sh "kubectl apply --validate=false -f /var/lib/jenkins/workspace/react/k8s/demo.yaml"
                     }
                 }
             }
