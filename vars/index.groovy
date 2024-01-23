@@ -42,7 +42,13 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-
+          stage('CONTAINER') {
+                steps {
+                    script {
+                        sh "docker run -p 8083:3000 ${env.IMAGE}:${env.IMAGETAG}"
+                    }
+                }
+            }
         }
     }
 }
