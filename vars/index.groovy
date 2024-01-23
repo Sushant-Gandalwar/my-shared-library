@@ -35,19 +35,10 @@ def call(Map pipelineParams) {
                             sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                              sh """
                                 docker push '${env.IMAGE}:${env.IMAGETAG}'
-                                
+                                docker rmi '${env.IMAGE}:${env.IMAGETAG}'
                                 
                                 """
                         }
-                    }
-                }
-            }
-            
-            stage('CONTAINER') {
-                
-                steps {
-                    script {
-                        sh "docker run -p 8085:8000 ${env.IMAGE}:${env.IMAGETAG}"
                     }
                 }
             }
