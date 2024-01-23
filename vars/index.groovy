@@ -42,13 +42,47 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-          stage('CONTAINER') {
+           stage('ARC-DEV APPROVAL') {
+               
                 steps {
                     script {
-                        sh "docker run -p 8084:3000 ${env.IMAGE}:${env.IMAGETAG}"
+                        echo "Approval is required to perform deployment in DEV, Click 'Proceed or Abort'"
+                    }
+
+                    timeout(time: 2, unit: 'HOURS') {
+                        verifybuild()
+                    }
+                }
+            }
+
+            stage('CONTAINER') {
+                when {
+                    expression { env.releaseskip == 'dorelease' }
+                }
+                steps {
+                    script {
+                        sh "docker run -p 8083:3000 ${env.IMAGE}:${env.IMAGETAG}"
                     }
                 }
             }
         }
     }
 }
+
+def verifybuild() {
+
+        def userInput = input(
+            id: 'userInput', message: 'Approve Deployment!',        parameters: [
+
+      [$class: 'BooleanParameterDefinition', defaultValue: 'false', description: 'click to skip', name: 'skip'],
+    ])
+
+        if(!userInput) {
+            env.releaseskip = 'dorelease'
+            }
+            else {
+                env.releaseskip = 'norelease'
+
+            }
+
+    }
