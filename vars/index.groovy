@@ -11,6 +11,7 @@ def call(Map pipelineParams) {
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             KUBERNETES_MANIFEST_FILE = '/var/lib/jenkins/workspace/react/k8s/demo.yaml'
         }
+        }
 
         stages {
             stage('INITIALIZE') {
@@ -47,7 +48,10 @@ def call(Map pipelineParams) {
             stage('ARC-DEV APPROVAL') {
                 steps {
                     script {
-                        sh "kubectl apply --validate=false -f /var/lib/jenkins/workspace/react/k8s/demo.yaml"
+                       sh 'gcloud container clusters get-credentials sushant --zone us-west4-b --project jenkins-407204'
+            
+                        // Deploy your application using kubectl
+                        sh "kubectl apply -f ${env.KUBERNETES_MANIFEST_FILE}"
                     }
                 }
             }
