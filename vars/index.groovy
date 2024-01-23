@@ -10,7 +10,7 @@ def call(Map pipelineParams) {
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             KUBERNETES_MANIFEST_FILE = '/var/lib/jenkins/workspace/react/k8s/demo.yaml'
-        }
+        
         }
 
         stages {
