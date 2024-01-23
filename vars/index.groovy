@@ -6,8 +6,8 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            IMAGE = 'hello-world-html'
-            IMAGETAG = 'latest' // You can parameterize this based on your needs
+             IMAGE = "${pipelineParams.dockerImage}"
+            IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
 
