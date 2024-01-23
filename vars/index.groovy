@@ -35,7 +35,7 @@ def call(Map pipelineParams) {
                             sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                              sh """
                                 docker push '${env.IMAGE}:${env.IMAGETAG}'
-                                docker rmi '${env.IMAGE}:${env.IMAGETAG}'
+                               
                                 
                                 """
                         }
