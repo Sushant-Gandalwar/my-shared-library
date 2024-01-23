@@ -48,7 +48,7 @@ def call(Map pipelineParams) {
             stage('ARC-DEV APPROVAL') {
                 steps {
                     script {
-                       sh 'gcloud container clusters get-credentials sushant --zone us-west4-b --project jenkins-407204'
+                       // sh 'gcloud container clusters get-credentials sushant --zone us-west4-b --project jenkins-407204'
             
                         // Deploy your application using kubectl
                         sh "kubectl apply -f ${env.KUBERNETES_MANIFEST_FILE}"
