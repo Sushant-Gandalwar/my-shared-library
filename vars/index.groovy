@@ -6,7 +6,7 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-             IMAGE = "${pipelineParams.dockerImage}"
+            IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
@@ -43,6 +43,37 @@ def call(Map pipelineParams) {
                 }
             }
 
+            stage('Approval') {
+                steps {
+                    script {
+                        def userInput = input(
+                            id: 'userInput', message: 'Approve Deployment!',
+                            parameters: [
+                                [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Click to skip', name: 'skip'],
+                            ]
+                        )
+
+                        if (userInput) {
+                            echo 'Proceeding to the next stage.'
+                        } else {
+                            echo 'Skipping the next stage.'
+                            currentBuild.result = 'ABORTED'
+                            error('Deployment skipped as per user input.')
+                        }
+                    }
+                }
+            }
+
+            stage('Next Stage') {
+                when {
+                    expression { currentBuild.result != 'ABORTED' }
+                }
+                steps {
+                    script {
+                        echo 'This is the next stage after approval.'
+                    }
+                }
+            }
         }
     }
 }
