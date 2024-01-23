@@ -10,7 +10,6 @@ def call(Map pipelineParams) {
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             KUBERNETES_MANIFEST_FILE = '/var/lib/jenkins/workspace/react/k8s/demo.yaml'
-        
         }
 
         stages {
@@ -35,22 +34,16 @@ def call(Map pipelineParams) {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                             sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
+                            sh "docker push '${env.IMAGE}:${env.IMAGETAG}'"
                         }
                     }
                 }
             }
 
-            stage('ARC-DEV APPROVAL') {
+            stage('Deploy to Kubernetes') {
                 steps {
                     script {
-                       // sh 'gcloud container clusters get-credentials sushant --zone us-west4-b --project jenkins-407204'
-            
-                        // Deploy your application using kubectl
+                        // Apply the Kubernetes manifest
                         sh "kubectl apply -f ${env.KUBERNETES_MANIFEST_FILE}"
                     }
                 }
