@@ -10,7 +10,7 @@ def call(Map pipelineParams) {
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             KUBERNETES_MANIFEST_FILE = '/var/lib/jenkins/workspace/react/k8s/demo.yaml'
-            PROJECT_ID = 'jenkins-296812'
+            PROJECT_ID = 'jenkins-407204'
                 CLUSTER_NAME = 'k8s-cluster'
                 LOCATION = 'us-central1-c'
                
