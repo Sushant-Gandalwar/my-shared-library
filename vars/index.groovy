@@ -1,7 +1,9 @@
 def call(Map pipelineParams) {
     pipeline {
         agent any
-
+        tools {
+		maven 'Maven'
+	}
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
