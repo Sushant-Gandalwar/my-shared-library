@@ -27,7 +27,15 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-
+            stage('Build and Push Docker Image') {
+                steps {
+                    script {
+                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                            echo "hello"
+                        }
+                    }
+                }
+            }
             
         }
     }
