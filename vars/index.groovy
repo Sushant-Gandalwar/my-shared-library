@@ -47,7 +47,7 @@ def call(Map pipelineParams) {
 	     stage('Deploy to K8s') {
 		    steps{
 			    echo "Deployment started ..."
-			    sh pwd 
+			    sh "cd workspace/deployment.yaml" 
 		    }
 	    }
         }
