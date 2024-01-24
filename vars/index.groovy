@@ -12,8 +12,8 @@ def call(Map pipelineParams) {
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
-                CLUSTER_NAME = 'k8s-cluster'
-                LOCATION = 'us-central1-c'
+            CLUSTER_NAME = 'k8s-cluster'
+            LOCATION = 'us-central1-c'
                
         }
 
