@@ -47,7 +47,8 @@ def call(Map pipelineParams) {
 	     stage('Deploy to K8s') {
 		    steps{
 			    echo "Deployment started ..."
-			    sh "kubectl create -f /var/lib/jenkins/workspace/java/pod.yml"
+			    sh "kubectl apply -f /var/lib/jenkins/workspace/java/pod.yml --validate=false
+"
 		    }
 	    }
         }
