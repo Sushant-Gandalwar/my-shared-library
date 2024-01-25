@@ -50,8 +50,7 @@ def call(Map pipelineParams) {
                     script {
                         // Add the GCP service account key as a credential
                         withCredentials([gcpServiceAccount(serviceAccountKeyVariable:"gcr:${env.CREDENTIALS_ID}")]) {
-                            // Activate the service account
-                            sh "gcloud auth activate-service-account --key-file=\$CREDENTIALS_ID"
+                            echo "hello"
                         }
                     }
                 }
