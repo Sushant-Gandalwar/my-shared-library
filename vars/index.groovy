@@ -17,21 +17,24 @@ def call(Map pipelineParams) {
         }
 
         stages {
-            stage('INITIALIZE') {
-                steps {
-                    script {
-                        echo "Initializing environment for webstore delivery pipeline"
-                        echo "Git URL: ${env.scmUrl}"
-                    }
-                }
-                post {
-                    failure {
-                        script {
-                            error("Initialization code has an error for ${APP_Name}")
-                        }
-                    }
-                }
-            }
+             stage('Scm Checkout') {
+		    steps {
+			    checkout scm
+		    }
+	    }
+	    
+	    stage('Build') {
+		    steps {
+			    sh 'mvn clean package'
+		    }
+	    }
+	    
+	    stage('Test') {
+		    steps {
+			    echo "Testing..."
+			    sh 'mvn test'
+		    }
+	    }
 
             stage('Build Docker Image') {
                 steps {
