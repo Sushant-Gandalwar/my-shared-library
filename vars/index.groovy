@@ -45,16 +45,15 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-	 stage('Deploy to GKE') {
-            steps{
-                withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                   sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION}--project ${env.PROJECT_ID}"
-	          sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
-              }
-
-            }
+	   stage('Deploy to GKE') {
+    steps {
+        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+            sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION} --project=${env.PROJECT_ID}"
+            sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
         }
-          
+    }
+}
+
         }
     }
 }
