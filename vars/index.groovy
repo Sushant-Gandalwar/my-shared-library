@@ -39,16 +39,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Pull Docker Image from Google Container Registry') {
-                steps {
-                    script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "docker pull gcr.io/jenkins-407204/demo@sha256:c2eb93ab79ef155ee920c2c519451d69e2bd7362d67c5069a278f93bbce1493f"
-                        }
-                    }
-                }
-            }
-            stage('Pull Docker Image from Google Container Registry') {
+            stage('Apply Kubernetes Deployment') {
                 steps {
                     script {
                         sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
