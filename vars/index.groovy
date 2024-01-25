@@ -43,21 +43,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Deploy to GKE') {
-                steps {
-                    script {
-                        // Create a temporary file for the service account key
-                        def serviceAccountKeyFile = File.createTempFile("gcp-key", ".json")
-                        serviceAccountKeyFile.write(SERVICE_ACCOUNT_KEY_CONTENT)
-
-                        // Activate service account and get cluster credentials
-                        sh "gcloud auth activate-service-account --key-file=${serviceAccountKeyFile}"
-                        sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
-
-                       echo "hello"
-                    }
-                }
-            }
+            
         }
     }
 }
