@@ -48,6 +48,13 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+            stage('Pull Docker Image from Google Container Registry') {
+                steps {
+                    script {
+                        sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
+                    }
+                }
+            }
         }
     }
 }
