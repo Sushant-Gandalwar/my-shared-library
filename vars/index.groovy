@@ -45,11 +45,11 @@ def call(Map pipelineParams) {
             stage('Deploy to GKE') {
                 steps {
                     script {
-                        // Authenticate with Google Cloud using the service account key
-                        withCredentials([credentialsId(credentialsId: ${CREDENTIALS_ID}, projectId: ${PROJECT_ID})]) {
+                        withCredentials([googleServiceAccount(credentialsId: "${CREDENTIALS_ID}", projectId: "${PROJECT_ID}")]) {
                             sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
                             echo "Hello"
                         }
+
                     }
                 }
             }
