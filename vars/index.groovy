@@ -1,21 +1,13 @@
-def call(Map pipelineParams) {
-    pipeline {
-        agent any
-
-        environment {
-            scmUrl = "${pipelineParams.scmUrl}"
-            APP_Name = "${pipelineParams.appName}"
-            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGE_TAG = "${params.Parameter}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-	    PROJECT_ID = 'jenkins-407204'
+pipeline {
+    agent any
+    environment {
+        PROJECT_ID = 'jenkins-407204'
         CLUSTER_NAME = 'k8s-cluster'
-        LOCATION =  'us-central1-c'
-        }
-
-        stages {
-            stage('INITIALIZE') {
+        LOCATION = 'us-central1-c'
+        CREDENTIALS_ID = 'f3d27808a72f4b4584aa7f7edd4447d1'
+    }
+    stages {
+        stage('INITIALIZE') {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
@@ -31,31 +23,28 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Build and Push Docker Image') {
-                steps {
-                    script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
-                        }
+        stage("Build image") {
+            steps {
+                script {
+                    myapp = docker.build("sushantgandalwar/hello:${env.BUILD_ID}")
+                }
+            }
+        }
+        stage("Push image") {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                            myapp.push("latest")
+                            myapp.push("${env.BUILD_ID}")
                     }
                 }
             }
-	   stage('Deploy to GKE') {
-    steps {
-        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-          
-            sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
+        }
+        stage('Deploy to GKE') {
+            steps{
+                sh "sed -i 's/hello:latest/hello:${env.BUILD_ID}/g' deployment.yaml"
+                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+            }
         }
     }
 }
-
-        }
-    }
-}
-
-
