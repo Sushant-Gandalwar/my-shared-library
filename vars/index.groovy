@@ -47,11 +47,13 @@ def call(Map pipelineParams) {
             }
 	        stage('Deploy to GKE') {
                 steps {
-                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                        sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION} --project=${env.PROJECT_ID}"
-			echo "helo"
-                        // sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
-                    }
+                   sh 'ls -ltr'
+			    sh 'pwd'
+			    // sh "sed -i 's/tagversion/${env.BUILD_ID}/g' serviceLB.yaml"
+				sh "sed -i '/var/lib/jenkins/workspace/demo/deployment.yaml'
+			   step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+			    echo "Deployment Finished ..."
+		    }
                 }
             }
 
