@@ -28,13 +28,20 @@ def call(Map pipelineParams) {
                 }
             }
             stage('Build and Push Docker Image') {
+                  stage('Build and Push Docker Image') {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            echo "hello"
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                             sh """
+                                docker push '${env.IMAGE}:${env.IMAGETAG}'
+                               
+                                
+                                """
                         }
                     }
                 }
+            }
             }
             
         }
