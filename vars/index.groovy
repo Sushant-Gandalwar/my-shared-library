@@ -28,26 +28,27 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Build and Push Docker Image') {
-                steps {
-                    script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
-                            sh "docker push '${env.IMAGE}:${env.IMAGE_TAG}'"
-                        }
-                    }
-                }
-            }
-
-          
-
-            stage('Apply Kubernetes Deployment') {
-                steps {
-                    script {
-                        sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
-                    }
-                }
-            }
+             stage('Build Docker Image') {
+		    steps {
+			    sh 'whoami'
+			    script {
+				    myimage = docker.build("ameintu/devops:${env.BUILD_ID}")
+			    }
+		    }
+	    }
+	    
+	    stage("Push Docker Image") {
+		    steps {
+			    script {
+				    echo "Push Docker Image"
+				    withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+            				sh "docker login -u ameintu -p ${dockerhub}"
+				    }
+				        myimage.push("${env.BUILD_ID}")
+				    
+			    }
+		    }
+	    }
         }
     }
 }
