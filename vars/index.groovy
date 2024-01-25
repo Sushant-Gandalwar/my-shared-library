@@ -46,6 +46,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io",projectId: "${PROJECT_ID}"]) {
+                        sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION}"
                         echo "hello"
                       }
                     }
