@@ -12,7 +12,6 @@ def call(Map pipelineParams) {
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'k8s-cluster'
             LOCATION = 'us-central1-c'
-            SERVICE_ACCOUNT_KEY_CONTENT = credentials("${CREDENTIALS_ID}")
         }
 
         stages {
@@ -42,6 +41,26 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+          stage('Deploy to GKE') {
+    steps {
+        script {
+            // Authenticate with GKE cluster
+            withCredentials([gcpServiceAccount(credentialsId: "${CREDENTIALS_ID}", 
+                                               projectId: "${PROJECT_ID}", 
+                                               jsonKeyVariable: 'GCLOUD_JSON_KEY')]) {
+                sh "gcloud auth activate-service-account --key-file=\$GCLOUD_JSON_KEY"
+            }
+        }
+    }
+    post {
+        success {
+            echo "Deployment to GKE successful"
+        }
+        failure {
+            error "Deployment to GKE failed"
+        }
+    }
+}
 
             
         }
