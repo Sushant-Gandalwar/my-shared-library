@@ -45,11 +45,9 @@ def call(Map pipelineParams) {
             stage('Deploy to GKE') {
                 steps {
                     script {
-                        withCredentials([googleServiceAccount(credentialsId: "${CREDENTIALS_ID}", projectId: "${PROJECT_ID}")]) {
-                            
-                            echo "Hello"
-                        }
-
+                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                        echo "hello"
+                      }
                     }
                 }
             }
