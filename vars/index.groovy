@@ -49,6 +49,7 @@ def call(Map pipelineParams) {
             steps{
                 withCredentials([file(credentialsId: 'your-google-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
     sh 'gcloud ...'
+			echo "hello"
 }
 
             }
