@@ -6,7 +6,7 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-             IMAGE = "${pipelineParams.dockerImage}"
+            IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
         }
@@ -32,36 +32,22 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
+                            sh "docker push '${env.IMAGE}:${env.IMAGE_TAG}'"
                         }
                     }
                 }
             }
-            stage('Build and Push Docker Image') {
+
+            stage('Pull Docker Image from Google Container Registry') {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                           
-                                docker pull 'gcr.io/jenkins-407204/demo@sha256:c2eb93ab79ef155ee920c2c519451d69e2bd7362d67c5069a278f93bbce1493f'
-                               
-                                
-                              
+                            sh "docker pull gcr.io/jenkins-407204/demo@sha256:c2eb93ab79ef155ee920c2c519451d69e2bd7362d67c5069a278f93bbce1493f"
                         }
                     }
                 }
             }
-          
-          
         }
     }
 }
-
-
-
-
-
