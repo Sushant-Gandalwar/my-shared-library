@@ -46,11 +46,11 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Authenticate with Google Cloud using the service account key
-                        withCredentials([googleServiceAccount(credentialsId: CREDENTIALS_ID, projectId: PROJECT_ID)]) {
-                            withDockerRegistry([credentialsId: "gcr:${CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                        withCredentials([googleServiceAccount(credentialsId: "gcr:${CREDENTIALS_ID}", projectId: "gcr:${PROJECT_ID}")]) {
+                           
                                 sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
                                 echo "hello"
-                            }
+                            
                         }
                     }
                 }
