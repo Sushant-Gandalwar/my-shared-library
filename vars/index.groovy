@@ -1,7 +1,9 @@
 def call(Map pipelineParams) {
     pipeline {
         agent any
-
+        tools {
+            maven 'Maven'
+        }
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
@@ -28,27 +30,26 @@ def call(Map pipelineParams) {
                 }
             }
 
-             stage('Build Docker Image') {
-		    steps {
-			    sh 'whoami'
-			    script {
-				    myimage = docker.build("ameintu/devops:${env.BUILD_ID}")
-			    }
-		    }
-	    }
-	    
-	    stage("Push Docker Image") {
-		    steps {
-			    script {
-				    echo "Push Docker Image"
-				    withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-            				sh "docker login -u ameintu -p ${dockerhub}"
-				    }
-				        myimage.push("${env.BUILD_ID}")
-				    
-			    }
-		    }
-	    }
+            stage('Build Docker Image') {
+                steps {
+                    script {
+                        sh 'whoami'
+                        myimage = docker.build("sushantgandalwar/devops:${env.BUILD_ID}")
+                    }
+                }
+            }
+
+            stage("Push Docker Image") {
+                steps {
+                    script {
+                        echo "Push Docker Image"
+                        withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                            sh "docker login -u sushantgandalwar -p ${dockerhub}"
+                        }
+                        myimage.push("${env.BUILD_ID}")
+                    }
+                }
+            }
         }
     }
 }
