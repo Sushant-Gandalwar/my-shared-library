@@ -45,10 +45,13 @@ def call(Map pipelineParams) {
             stage('Deploy to GKE') {
                 steps {
                     script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}",projectId: "${PROJECT_ID}"]) {
-                        sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION}"
-                        echo "hello"
-                      }
+                        // Authenticate with Google Cloud using the service account key
+                        withCredentials([googleServiceAccount(credentialsId: CREDENTIALS_ID, projectId: PROJECT_ID)]) {
+                            withDockerRegistry([credentialsId: "gcr:${CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                                sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
+                                echo "hello"
+                            }
+                        }
                     }
                 }
             }
