@@ -12,6 +12,7 @@ def call(Map pipelineParams) {
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'k8s-cluster'
             LOCATION = 'us-central1-c'
+            SERVICE_ACCOUNT_KEY_FILE = credentials("${CREDENTIALS_ID}")
         }
 
         stages {
@@ -45,12 +46,10 @@ def call(Map pipelineParams) {
             stage('Deploy to GKE') {
                 steps {
                     script {
-                        // Authenticate with Google Cloud using the service account key
-                        withCredentials([googleServiceAccount(credentialsId: "gcr:${CREDENTIALS_ID}", projectId: "gcr:${PROJECT_ID}")]) {
-                           
-                                sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
-                                echo "hello"
-                            
+                        withCredentials([file(credentialsId: "${CREDENTIALS_ID}", variable: 'SERVICE_ACCOUNT_KEY_FILE')]) {
+                            sh "gcloud auth activate-service-account --key-file=${SERVICE_ACCOUNT_KEY_FILE}"
+                            sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
+                            echo "hello"
                         }
                     }
                 }
