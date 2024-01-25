@@ -47,7 +47,7 @@ def call(Map pipelineParams) {
             }
 	 stage('Deploy to GKE') {
             steps{
-                withCredentials([file(credentialsId: 'your-google-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
     sh 'gcloud ...'
 			echo "hello"
 }
