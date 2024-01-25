@@ -6,12 +6,13 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGE_TAG = "${params.Parameter}"
+            IMAGE = "${pipelineParams.dockerImage}"
+            IMAGE_TAG = "${pipelineParams.dockerImageTag}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-	    PROJECT_ID = 'jenkins-407204'
-        CLUSTER_NAME = 'k8s-cluster'
-        LOCATION =  'us-central1-c'
+            PROJECT_ID = 'jenkins-407204'
+            CLUSTER_NAME = 'k8s-cluster'
+            LOCATION = 'us-central1-c'
+            SERVICE_ACCOUNT_KEY_CONTENT = credentials("${CREDENTIALS_ID}")
         }
 
         stages {
@@ -19,7 +20,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                        echo "Git URL: ${env.scmUrl}"
+                        echo "Git URL: ${scmUrl}"
                     }
                 }
                 post {
@@ -34,26 +35,29 @@ def call(Map pipelineParams) {
             stage('Build and Push Docker Image') {
                 steps {
                     script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
+                        withDockerRegistry([credentialsId: "gcr:${CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                            sh "cd ${DOCKERDIRECTORY} && docker build -t ${IMAGE}:${IMAGE_TAG} -f Dockerfile ."
+                            sh "docker push ${IMAGE}:${IMAGE_TAG}"
                         }
                     }
                 }
             }
-	        stage('Deploy to GKE') {
+
+            stage('Deploy to GKE') {
                 steps {
-                    withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                        sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --zone ${env.LOCATION} --project=${env.PROJECT_ID}"
-                        sh "kubectl apply -f /var/lib/jenkins/workspace/demo/deployment.yaml"
+                    script {
+                        // Create a temporary file for the service account key
+                        def serviceAccountKeyFile = File.createTempFile("gcp-key", ".json")
+                        serviceAccountKeyFile.write(SERVICE_ACCOUNT_KEY_CONTENT)
+
+                        // Activate service account and get cluster credentials
+                        sh "gcloud auth activate-service-account --key-file=${serviceAccountKeyFile}"
+                        sh "gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${LOCATION}"
+
+                       echo "hello"
                     }
                 }
             }
-
         }
     }
 }
