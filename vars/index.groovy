@@ -2,8 +2,8 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
 
-         parameters {
-            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release', )
+        parameters {
+            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release')
         }
 
         environment {
@@ -13,7 +13,6 @@ def call(Map pipelineParams) {
             IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             COMMAND = "${params.Parameter}"
-            NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'demo'
@@ -25,17 +24,17 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        log.info("Initializing environment for webstore delivery pipeline")
                         echo 'Start Initializing!'
-                        // valuesYaml = loadValuesYaml()
-                        git branch: pipelineParams.branch,url: pipelineParams.scmUrl     
-                        if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
-                          
+                        git branch: pipelineParams.branch, url: pipelineParams.scmUrl
 
-                          env.IMAGETAG = '-' + env.BUILD_NUMBER
+                        // Use Jenkins build number as part of the Docker image tag
+                        if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
+                            env.IMAGETAG = "-${env.BUILD_NUMBER}"
+                        } else {
+                            env.IMAGETAG = env.IMAGE_TAG
                         }
-                        // echo "Initializing environment for webstore delivery pipeline"
-                        // echo "Git URL: ${env.scmUrl}"
+
+                        echo "Image tag: ${env.IMAGE}:${env.IMAGETAG}"
                     }
                 }
                 post {
@@ -50,10 +49,10 @@ def call(Map pipelineParams) {
             stage('Build, Rename, and Push Docker Image') {
                 steps {
                     script {
-                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
+                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                              sh """
-                                docker push '${env.IMAGE}:${env.IMAGE_TAG}'
+                                docker push '${env.IMAGE}:${env.IMAGETAG}'
                              """
                         }
                     }
