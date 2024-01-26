@@ -1,10 +1,9 @@
 def call(Map pipelineParams) {
-
     pipeline {
         agent any   
         parameters {
-            choice(name: 'Build_Type', choices: "BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release", description: 'Select the Build type' )
-            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if chosen DEPLOY_ONLY OR pass the sbt release command if chosen Publish_to_Release', )
+            choice(name: 'Build_Type', choices: "BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release", description: 'Select the Build type')
+            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if chosen DEPLOY_ONLY OR pass the sbt release command if chosen Publish_to_Release')
         }        
 
         environment {
@@ -24,9 +23,10 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        // log.info("Initializing environment for webstore delivery pipeline")
                         echo 'Start Initializing!'
-                                       
+                        cleanWs()  // Clean the workspace
+                        checkout scmUrl  // Checkout the repository
+                    }
                 }
             }
         }
