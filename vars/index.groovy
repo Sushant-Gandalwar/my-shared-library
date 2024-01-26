@@ -7,7 +7,6 @@ def call(Map pipelineParams) {
         }
 
         environment {
-            scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
