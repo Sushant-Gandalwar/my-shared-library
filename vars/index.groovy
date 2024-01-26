@@ -7,8 +7,8 @@ def call(Map pipelineParams) {
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGE_TAG = "${params.Parameter}"
-            NEW_IMAGE_NAME = "sushant"  // Specify the new name for the image
+            IMAGE_TAG = 'demo'
+            NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'k8s-cluster'
