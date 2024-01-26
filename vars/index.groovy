@@ -12,7 +12,6 @@ def call(Map pipelineParams) {
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'demo'
-            LOCATION =  'us-central1'
         }
 
         stages {
