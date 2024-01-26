@@ -25,7 +25,11 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo 'Start Initializing!'
-                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
+
+                        // Specify the Git tool
+                        def gitTool = tool 'Default'
+
+                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl, gitTool: gitTool
 
                         // Use Jenkins build number as part of the Docker image tag
                         if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
