@@ -3,7 +3,7 @@ def call(Map pipelineParams) {
         agent any
 
         parameters {
-            string(name: 'IMAGE_TAG_PARAM', defaultValue: 'latest', description: 'Specify the Docker image tag')
+            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release', )
         }
 
         environment {
@@ -11,7 +11,7 @@ def call(Map pipelineParams) {
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGETAG = "${params.IMAGE_TAG_PARAM}"
+            IMAGE_TAG = "${params.Parameter}"
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
@@ -40,9 +40,9 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
                              sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
+                                docker push '${env.IMAGE}:${env.IMAGE_TAG}'
                              """
                         }
                     }
