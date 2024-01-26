@@ -39,25 +39,13 @@ def call(Map pipelineParams) {
                         }
 
                         echo "Image tag: ${env.IMAGE}:${env.IMAGETAG}"
+                        echo "Build Number: ${env.BUILD_NUMBER}"
                     }
                 }
                 post {
                     failure {
                         script {
                             error("Initialization code has an error for ${APP_Name}")
-                        }
-                    }
-                }
-            }
-
-            stage('Build, Rename, and Push Docker Image') {
-                steps {
-                    script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                             """
                         }
                     }
                 }
