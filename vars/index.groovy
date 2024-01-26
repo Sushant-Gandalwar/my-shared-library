@@ -49,8 +49,8 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Authenticate with GKE cluster
-                        withCredentials([gcpServiceAccount(credentialsId: "gcr:${env.CREDENTIALS_ID}", jsonKeyVariable:"gcr:${env.CREDENTIALS_ID}")]) {
-                            sh "gcloud auth activate-service-account --key-file=<(echo \"${CREDENTIALS_ID}\")"
+                        withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: 'CREDENTIALS_ID')]) {
+                            sh "gcloud auth activate-service-account --key-file=${CREDENTIALS_ID}"
                             sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --project ${env.PROJECT_ID} --zone ${env.LOCATION}"
                         }
 		    }
