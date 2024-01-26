@@ -26,9 +26,7 @@ def call(Map pipelineParams) {
                         echo 'Start Initializing!'
 
 
-                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
-
-                       echo "hello"
+                       
                     }
                 }
                 post {
