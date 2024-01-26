@@ -6,6 +6,11 @@ def call(Map pipelineParams) {
             string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release')
         }
 
+        tools {
+            // Specify the Git tool installation
+            git 'Git'
+        }
+
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
@@ -26,6 +31,7 @@ def call(Map pipelineParams) {
                     script {
                         echo 'Start Initializing!'
                         git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
+
                         // Use Jenkins build number as part of the Docker image tag
                         if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
                             env.IMAGETAG = "-${env.BUILD_NUMBER}"
