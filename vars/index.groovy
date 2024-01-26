@@ -24,34 +24,9 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        log.info("Initializing environment for webstore delivery pipeline")
+                        // log.info("Initializing environment for webstore delivery pipeline")
                         echo 'Start Initializing!'
-                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl                  
-                        if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
-                            env.PACKAGE_VERSION = sh(
-                                script: """
-                                    set +x
-                                    cat version.sbt | cut -d '=' -f2 | tr -d '\"'
-                                """,
-                                returnStdout: true
-                            ).trim()
-
-                            env.IMAGETAG = 'v' + env.PACKAGE_VERSION + '-' + env.BUILD_NUMBER
-                        } else if (env.IMAGE_TAG != 'default' && pipelineParams.branch == 'main') {
-                            env.IMAGETAG = env.IMAGE_TAG
-                        } else if (env.IMAGE_TAG == 'default') {
-                            env.GIT_COMMIT_ID = sh(
-                                script: """
-                                    set +x
-                                    git log -1 --pretty=%h
-                                """,
-                                returnStdout: true
-                            ).trim()
-                            env.IMAGETAG = 'v' + env.GIT_COMMIT_ID + '-' + env.BUILD_NUMBER                       
-                        } else {
-                            env.IMAGETAG = env.IMAGE_TAG
-                        }                        
-                    }
+                                       
                 }
             }
         }
