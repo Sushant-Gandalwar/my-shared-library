@@ -25,8 +25,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo 'Start Initializing!'
-                        git branch: pipelineParams.branch, url: pipelineParams.scmUrl
-
+                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl
                         // Use Jenkins build number as part of the Docker image tag
                         if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
                             env.IMAGETAG = "-${env.BUILD_NUMBER}"
