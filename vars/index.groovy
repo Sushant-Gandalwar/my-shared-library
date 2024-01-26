@@ -2,7 +2,7 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
 
-        parameters {
+         parameters {
             string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release', )
         }
 
@@ -12,7 +12,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
-              COMMAND = "${params.Parameter}"
+            COMMAND = "${params.Parameter}"
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
@@ -25,8 +25,17 @@ def call(Map pipelineParams) {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        echo "Initializing environment for webstore delivery pipeline"
-                        echo "Git URL: ${env.scmUrl}"
+                        log.info("Initializing environment for webstore delivery pipeline")
+                        echo 'Start Initializing!'
+                        // valuesYaml = loadValuesYaml()
+                        git branch: pipelineParams.branch,url: pipelineParams.scmUrl     
+                        if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
+                          
+
+                          env.IMAGETAG = '-' + env.BUILD_NUMBER
+                        }
+                        // echo "Initializing environment for webstore delivery pipeline"
+                        // echo "Git URL: ${env.scmUrl}"
                     }
                 }
                 post {
@@ -41,7 +50,7 @@ def call(Map pipelineParams) {
             stage('Build, Rename, and Push Docker Image') {
                 steps {
                     script {
-                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
                             sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
                              sh """
                                 docker push '${env.IMAGE}:${env.IMAGE_TAG}'
@@ -50,7 +59,6 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            
         }
     }
 }
