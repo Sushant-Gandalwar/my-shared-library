@@ -6,11 +6,6 @@ def call(Map pipelineParams) {
             string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release')
         }
 
-        tools {
-            // Specify the default Git tool installation
-            defaultTool 'Default'
-        }
-
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
