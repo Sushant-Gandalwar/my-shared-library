@@ -9,7 +9,6 @@ def call(Map pipelineParams) {
              IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-	    GKE_SA_KEY_CREDENTIALS = credentials('f3d27808a72f4b4584aa7f7edd4447d1')
 	    PROJECT_ID = 'jenkins-407204'
         CLUSTER_NAME = 'k8s-cluster'
         LOCATION =  'us-central1-c'
