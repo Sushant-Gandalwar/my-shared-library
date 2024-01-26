@@ -7,8 +7,8 @@ def call(Map pipelineParams) {
         }
 
         tools {
-            // Specify the Git tool installation
-            git 'Git'
+            // Specify the default Git tool installation
+            defaultTool 'Default'
         }
 
         environment {
