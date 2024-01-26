@@ -2,12 +2,16 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
 
+        parameters {
+            string(name: 'IMAGE_TAG_PARAM', defaultValue: 'latest', description: 'Specify the Docker image tag')
+        }
+
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGETAG = "${params.Parameter}"
+            IMAGETAG = "${params.IMAGE_TAG_PARAM}"
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
@@ -39,9 +43,7 @@ def call(Map pipelineParams) {
                             sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
                              sh """
                                 docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
+                             """
                         }
                     }
                 }
