@@ -46,19 +46,6 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-            stage('Authenticate with GCP') {
-                steps {
-                    script {
-                          withCredentials([file(credentialsId: 'f3d27808a72f4b4584aa7f7edd4447d1', variable: 'GKE_SA_KEY_CREDENTIALS')]) {
-                        // Your script here, accessing $GKE_SA_KEY_CREDENTIALS
-                        sh "gcloud auth activate-service-account --key-file=${GKE_SA_KEY_CREDENTIALS}"
-                        sh "gcloud container clusters get-credentials <CLUSTER_NAME> --region <REGION>"
-                        // Other deployment steps
-
-                        }
-                    }
-                }
-            }
         }
     }
 }
