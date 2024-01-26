@@ -26,8 +26,6 @@ def call(Map pipelineParams) {
                     script {
                         echo 'Start Initializing!'
 
-                        // Specify the Git tool
-                        def gitTool = tool 'Default'
 
                         git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl, gitTool: gitTool
 
