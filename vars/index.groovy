@@ -7,33 +7,20 @@ def call(Map pipelineParams) {
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
-            IMAGE_TAG = "${params.Parameter}"
-            COMMAND = "${params.Parameter}"
+            IMAGE_TAG = 'demo'
+            NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'demo'
             LOCATION =  'us-central1'
-            BRANCH =  "${pipelineParams.branch}"
         }
 
         stages {
             stage('INITIALIZE') {
                 steps {
                     script {
-                        echo 'Start Initializing!'
-
-
-                        git branch: pipelineParams.branch, credentialsId: pipelineParams.bitbucketCredentialsId, url: pipelineParams.scmUrl, gitTool: gitTool
-
-                        // Use Jenkins build number as part of the Docker image tag
-                        if (env.IMAGE_TAG == 'default' && pipelineParams.branch == 'main') {
-                            env.IMAGETAG = "-${env.BUILD_NUMBER}"
-                        } else {
-                            env.IMAGETAG = env.IMAGE_TAG
-                        }
-
-                        echo "Image tag: ${env.IMAGE}:${env.IMAGETAG}"
-                        echo "Build Number: ${env.BUILD_NUMBER}"
+                        echo "Initializing environment for webstore delivery pipeline"
+                        echo "Git URL: ${env.scmUrl}"
                     }
                 }
                 post {
@@ -44,6 +31,36 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+
+            stage('Build, Rename, and Push Docker Image') {
+                steps {
+                    script {
+                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
+                            sh "docker tag '${env.IMAGE}:${env.IMAGE_TAG}' '${env.IMAGE}:${env.NEW_IMAGE_NAME}'"
+
+                            sh """
+                                docker push '${env.IMAGE}:${env.IMAGE_TAG}'
+                                docker push '${env.IMAGE}:${env.NEW_IMAGE_NAME}'
+                            """
+                        }
+                    }
+                }
+            }
+            stage('Deploy to K8s') {
+		    steps{
+			   echo "Deployment started ..."
+			    sh 'ls -ltr'
+			    sh 'pwd'
+			    sh "sed -i 's/tagversion/${env.BUILD_ID}/g' serviceLB.yaml"
+				sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
+			    echo "Start deployment of serviceLB.yaml"
+			    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'serviceLB.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+				echo "Start deployment of deployment.yaml"
+				step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+			    echo "Deployment Finished ..."
+		    }
+	    }
         }
     }
 }
