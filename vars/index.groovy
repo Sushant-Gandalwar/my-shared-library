@@ -9,6 +9,7 @@ def call(Map pipelineParams) {
              IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+	    GCLOUD_KEY_JSON = credentials('f3d27808a72f4b4584aa7f7edd4447d1')
 	    PROJECT_ID = 'jenkins-407204'
         CLUSTER_NAME = 'k8s-cluster'
         LOCATION =  'us-central1-c'
@@ -49,8 +50,8 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         // Authenticate with GKE cluster
-                        withCredentials([file(credentialsId: env.CREDENTIALS_ID, variable: 'CREDENTIALS_ID')]) {
-                            sh "gcloud auth activate-service-account --key-file=${CREDENTIALS_ID}"
+                        withCredentials([json(credentialsId: env.GCLOUD_KEY_JSON, variable: 'GCLOUD_KEY_JSON')]) {
+                            sh "gcloud auth activate-service-account --key-file=<(echo '${GCLOUD_KEY_JSON}')"
                             sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --project ${env.PROJECT_ID} --zone ${env.LOCATION}"
                         }
 		    }
