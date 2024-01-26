@@ -6,13 +6,13 @@ def call(Map pipelineParams) {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-             IMAGE = "${pipelineParams.dockerImage}"
+            IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
+            NEW_IMAGE_NAME = "sushant"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-	    GCLOUD_KEY_JSON = credentials('f3d27808a72f4b4584aa7f7edd4447d1')
-	    PROJECT_ID = 'jenkins-407204'
-        CLUSTER_NAME = 'k8s-cluster'
-        LOCATION =  'us-central1-c'
+            PROJECT_ID = 'jenkins-407204'
+            CLUSTER_NAME = 'k8s-cluster'
+            LOCATION =  'us-central1-c'
         }
 
         stages {
@@ -36,29 +36,17 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
-                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGETAG}' -f Dockerfile ."
-                             sh """
-                                docker push '${env.IMAGE}:${env.IMAGETAG}'
-                               
-                                
-                                """
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
+
+                            sh """
+                                docker push '${env.IMAGE}:${env.IMAGE_TAG}'
+                                docker tag '${env.IMAGE}:${env.IMAGE_TAG}' '${env.NEW_IMAGE_NAME}:${env.IMAGE_TAG}'
+                                docker push '${env.NEW_IMAGE_NAME}:${env.IMAGE_TAG}'
+                            """
                         }
                     }
                 }
-	    }
-	   stage('Deploy to GKE') {
-                steps {
-                    script {
-                        // Authenticate with GKE cluster
-                        withCredentials([json(credentialsId: env.GCLOUD_KEY_JSON, variable: 'GCLOUD_KEY_JSON')]) {
-                            sh "gcloud auth activate-service-account --key-file=<(echo '${GCLOUD_KEY_JSON}')"
-                            sh "gcloud container clusters get-credentials ${env.CLUSTER_NAME} --project ${env.PROJECT_ID} --zone ${env.LOCATION}"
-                        }
-		    }
-		}
-	   }
+            }
         }
     }
 }
-
-
