@@ -11,8 +11,8 @@ def call(Map pipelineParams) {
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
-            CLUSTER_NAME = 'k8s-cluster'
-            LOCATION =  'us-central1-c'
+            CLUSTER_NAME = 'autopilot-cluster-1'
+            LOCATION =  'us-central1'
         }
 
         stages {
@@ -47,6 +47,19 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+            stage('Deploy to K8s') {
+		    steps{
+			    echo "Deployment started ..."
+			    sh 'ls -ltr'
+			    sh 'pwd'
+			   
+				sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
+			    
+				echo "Start deployment of deployment.yaml"
+				step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+			    echo "Deployment Finished ..."
+		    }
+	    }
         }
     }
 }
