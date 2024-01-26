@@ -2,10 +2,6 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
 
-        parameters {
-            string(name: 'Parameter', defaultValue: 'default', description: 'Pass the Docker image id if choosed DEPLOY_ONLY OR pass the sbt release command if choosed Publish_to_Release')
-        }
-
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
