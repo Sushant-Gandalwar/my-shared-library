@@ -29,13 +29,6 @@ def call(Map pipelineParams) {
                        
                     }
                 }
-                post {
-                    failure {
-                        script {
-                            error("Initialization code has an error for ${APP_Name}")
-                        }
-                    }
-                }
             }
         }
     }
