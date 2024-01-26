@@ -21,7 +21,6 @@ def call(Map pipelineParams) {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
                         echo "Git URL: ${env.scmUrl}"
-                        echo "env.BUILD_NUMBER"
                     }
                 }
                 post {
