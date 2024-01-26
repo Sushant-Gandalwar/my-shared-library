@@ -18,6 +18,7 @@ def call(Map pipelineParams) {
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'demo'
             LOCATION =  'us-central1'
+            BRANCH =  "${pipelineParams.branch}"
         }
 
         stages {
