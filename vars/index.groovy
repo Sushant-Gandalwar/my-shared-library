@@ -11,7 +11,7 @@ def call(Map pipelineParams) {
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
-            CLUSTER_NAME = 'autopilot-cluster-1'
+            CLUSTER_NAME = 'demo'
             LOCATION =  'us-central1'
         }
 
