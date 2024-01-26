@@ -9,6 +9,7 @@ def call(Map pipelineParams) {
              IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
+	    GKE_SA_KEY_CREDENTIALS = credentials(f3d27808a72f4b4584aa7f7edd4447d1)
 	    PROJECT_ID = 'jenkins-407204'
         CLUSTER_NAME = 'k8s-cluster'
         LOCATION =  'us-central1-c'
@@ -48,9 +49,11 @@ def call(Map pipelineParams) {
             stage('Authenticate with GCP') {
                 steps {
                     script {
-                        // Add the GCP service account key as a credential
-                        withCredentials([gcpServiceAccount(serviceAccountKeyVariable:"gcr:${env.CREDENTIALS_ID}")]) {
-                            echo "hello"
+                            withCredentials([file(credentialsId: 'gke-service-account-key', variable: 'GKE_SA_KEY_CREDENTIALS')]) {
+                        // Your script here, accessing $GKE_SA_KEY_CREDENTIALS
+                        sh "gcloud auth activate-service-account --key-file=${GKE_SA_KEY_CREDENTIALS}"
+                        sh "gcloud container clusters get-credentials <CLUSTER_NAME> --region <REGION>"
+                        // Other deployment steps
                         }
                     }
                 }
