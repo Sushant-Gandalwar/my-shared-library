@@ -12,6 +12,7 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             IMAGE_TAG = "${params.Parameter}"
+              COMMAND = "${params.Parameter}"
             NEW_IMAGE_NAME = "react"  // Specify the new name for the image
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
