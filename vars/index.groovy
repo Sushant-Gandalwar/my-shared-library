@@ -11,7 +11,7 @@ def call(Map pipelineParams) {
             PROJECT_ID = 'jenkins-407204'
             CLUSTER_NAME = 'demo'
             LOCATION =  'us-central1'
-            IMAGE_TAG = "${env.BUILD_NUMBER}"  // Set image tag to the build number
+            IMAGE_TAG = "${env.BUILD_NUMBER}"  
         }
 
         stages {
