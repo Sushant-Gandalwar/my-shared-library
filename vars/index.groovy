@@ -41,8 +41,23 @@ def call(Map pipelineParams) {
                     }
                 }
             }
+           stage('ARC-DEV APPROVAL') {
+               
+                steps {
+                    script {
+                        echo "Approval is required to perform deployment in DEV, Click 'Proceed or Abort'"
+                    }
+
+                    timeout(time: 2, unit: 'HOURS') {
+                        verifybuild()
+                    }
+                }
+            }
 
             stage('Deploy to K8s') {
+                when {
+                    expression { env.releaseskip == 'dorelease' }
+                }
                 steps {
                     echo "Deployment started ..."
                     sh 'ls -ltr'
@@ -62,3 +77,23 @@ def call(Map pipelineParams) {
         }
     }
 }
+
+def verifybuild() {
+
+        def userInput = input(
+            id: 'userInput', message: 'Approve Deployment!',        parameters: [
+
+      [$class: 'BooleanParameterDefinition', defaultValue: 'false', description: 'click to skip', name: 'skip'],
+    ])
+
+        if(!userInput) {
+            env.releaseskip = 'dorelease'
+            }
+            else {
+                env.releaseskip = 'norelease'
+
+            }
+
+    }
+
+
