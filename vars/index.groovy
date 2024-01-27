@@ -73,6 +73,13 @@ def call(Map pipelineParams) {
                     
                     echo "Deployment Finished ..."
                 }
+                 post {
+                    failure {
+                        script {
+                            error("Deployment failed has an error for ${APP_Name}")
+                        }
+                    }
+                }
             }
         }
     }
