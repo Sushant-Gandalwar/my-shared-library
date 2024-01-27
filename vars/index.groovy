@@ -76,7 +76,7 @@ def call(Map pipelineParams) {
                  post {
                     failure {
                         script {
-                            error("Deployment failed has an error for ${APP_Name}")
+                            error("Deployment failed has an error for ${CLUSTER_NAME}")
                         }
                     }
                 }
