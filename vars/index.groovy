@@ -31,7 +31,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Build, Rename, and Push Docker Image') {
+            stage('PUBLISH IMAGE') {
                 steps {
                     script {
                         withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
@@ -41,7 +41,7 @@ def call(Map pipelineParams) {
                     }
                 }
             }
-           stage('ARC-DEV APPROVAL') {
+           stage('ARC-QA APPROVAL') {
                
                 steps {
                     script {
@@ -54,7 +54,7 @@ def call(Map pipelineParams) {
                 }
             }
 
-            stage('Deploy to K8s') {
+            stage('ARC-QA DEPLOY') {
                 when {
                     expression { env.releaseskip == 'dorelease' }
                 }
