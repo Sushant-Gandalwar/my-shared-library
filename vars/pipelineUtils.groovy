@@ -9,7 +9,7 @@ def call(Map pipelineParams) {
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
             PROJECT_ID = 'jenkins-407204'
-            CLUSTER_NAME = 'demo'
+            CLUSTER_NAME = 'autopilot-cluster-1'
             LOCATION =  'us-central1'
             IMAGE_TAG = "${env.BUILD_NUMBER}"  
         }
