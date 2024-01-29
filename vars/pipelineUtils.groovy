@@ -1,18 +1,6 @@
 def call(Map pipelineParams) {
     pipeline {
         agent any
-        parameters {
-            choice(
-                name: 'Build_Type',
-                choices: 'BUILD&DEPLOY&Publish_to_snapshot\nDEPLOY_ONLY\nPublish_to_Release',
-                description: 'Select the Build type'
-            )
-            string(
-                name: 'Parameter',
-                defaultValue: 'default',
-                description: 'Pass the Docker image id if choosing DEPLOY_ONLY OR pass the sbt release command if choosing Publish_to_Release'
-            )
-        }
 
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
@@ -20,9 +8,10 @@ def call(Map pipelineParams) {
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-            // CREDENTIALS_PASS = "${pipelineParams.dockerCredentialsPass}"
-            // DB_CREDS_ID = "${pipelineParams.databaseCredentialsId}"
-            IMAGE_TAG = "${params.Parameter}"
+            PROJECT_ID = 'jenkins-407204'
+            CLUSTER_NAME = 'demo'
+            LOCATION =  'us-central1'
+            IMAGE_TAG = "${env.BUILD_NUMBER}"  
         }
 
         stages {
@@ -31,58 +20,85 @@ def call(Map pipelineParams) {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
                         echo "Git URL: ${env.scmUrl}"
-                        
                     }
                 }
                 post {
                     failure {
                         script {
-                            echo "Initialization code has an error for ${APP_Name}"
+                            error("Initialization code has an error for ${APP_Name}")
                         }
                     }
                 }
             }
-            stage('BUILD') {
-            when {
-                expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
-            }            
-                steps {
-                    script {
-                        echo "Running Reload, clean and compile"
-                    }
-		     sh ''' 
-		          java -version 
-		       	'''
-                    sh "sbt reload && sbt clean && sbt compile"
-		  
-                }
-                post {
-                  failure {
-                    script {
-                      echo "Build and compile failed for Service: ${APP_NAME}"
-		         }
-                  }
-                }
-            }
+
             stage('PUBLISH IMAGE') {
-               when {
-                     expression { params.Build_Type == 'BUILD&DEPLOY&Publish_to_snapshot' }
-               }                        
                 steps {
                     script {
-                        echo "Building docker image and publishing to GCR"
+                        withDockerRegistry([credentialsId: "gcr:${env.CREDENTIALS_ID}", url: "https://gcr.io"]) {
+                            sh "cd ${env.DOCKERDIRECTORY} && docker build -t '${env.IMAGE}:${env.IMAGE_TAG}' -f Dockerfile ."
+                            sh "docker push '${env.IMAGE}:${env.IMAGE_TAG}'"
+                        }
                     }
-                    sh "sbt publish"
-                    sh "sbt docker:publishLocal"
-                    
-
+                }
+            }
+           stage('ARC-QA APPROVAL') {
+               
+                steps {
                     script {
-                        echo "Published Docker image ${env.IMAGE} to GCR"
+                        echo "Approval is required to perform deployment in DEV, Click 'Proceed or Abort'"
+                    }
+
+                    timeout(time: 2, unit: 'HOURS') {
+                        verifybuild()
                     }
                 }
             }
 
-
+            stage('ARC-QA DEPLOY') {
+                when {
+                    expression { env.releaseskip == 'dorelease' }
+                }
+                steps {
+                    echo "Deployment started ..."
+                    sh 'ls -ltr'
+                    sh 'pwd'
+                    sh "sed -i 's/tagversion/${env.BUILD_NUMBER}/g' serviceLB.yaml"
+                    sh "sed -i 's/tagversion/${env.BUILD_NUMBER}/g' deployment.yaml"
+                    
+                    echo "Start deployment of serviceLB.yaml"
+                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'serviceLB.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                    
+                    echo "Start deployment of deployment.yaml"
+                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                    
+                    echo "Deployment Finished ..."
+                }
+                 post {
+                    failure {
+                        script {
+                            error("Deployment failed has an error for ${CLUSTER_NAME}")
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+def verifybuild() {
+
+        def userInput = input(
+            id: 'userInput', message: 'Approve Deployment!',        parameters: [
+
+      [$class: 'BooleanParameterDefinition', defaultValue: 'false', description: 'click to skip', name: 'skip'],
+    ])
+
+        if(!userInput) {
+            env.releaseskip = 'dorelease'
+            }
+            else {
+                env.releaseskip = 'norelease'
+
+            }
+
+    }
