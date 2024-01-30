@@ -2,8 +2,9 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
         environment {
-            scmUrl = 'https://github.com/Sushant-Gandalwar/Jenkins-Docker-Kubernetes-Project3'
+            scmUrl = "${pipelineParams.scmUrl}"
             APP_Name = "${pipelineParams.appName}"
+            GIT_ID = "${pipelineParams.git}"
         }
 
         stages {
@@ -11,7 +12,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                        git branch: 'main', credentialsId: 'sushant-git', url: env.scmUrl
+                        git branch: 'main', credentialsId: env.GIT_ID, url: env.scmUrl
                     }
                 }
                 post {
