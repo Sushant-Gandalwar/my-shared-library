@@ -20,7 +20,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                         checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'sushant-git', url: env.scmUrl]]])
+                         checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'env.sushant-git', url: env.scmUrl]]])
                     }
                 }
                 post {
