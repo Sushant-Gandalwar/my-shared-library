@@ -4,7 +4,8 @@ def call(Map pipelineParams) {
 
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
-            APP_Name = "${pipelineParams.appName}"
+            APP_Name = "${pipelineParams.git}"
+            sushant-git = "${pipelineParams.appName}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
@@ -19,7 +20,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                        echo "Git URL: ${env.scmUrl}"
+                         checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'sushant-git', url: env.scmUrl]]])
                     }
                 }
                 post {
