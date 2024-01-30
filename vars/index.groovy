@@ -19,7 +19,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                        checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${env.scmUrl}", credentialsId: "${pipelineParams.bitbucketCredentialsId}"]]])
+                        git branch: 'main', url:'https://github.com/Sushant-Gandalwar/Jenkins-Docker-Kubernetes-Project3'
                     }
                 }
                 post {
