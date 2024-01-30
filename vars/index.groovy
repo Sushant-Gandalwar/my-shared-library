@@ -2,15 +2,8 @@ def call(Map pipelineParams) {
     pipeline {
         agent any
         environment {
-            scmUrl = "${pipelineParams.scmUrl}"
+            scmUrl = 'https://github.com/Sushant-Gandalwar/Jenkins-Docker-Kubernetes-Project3'
             APP_Name = "${pipelineParams.appName}"
-            DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
-            IMAGE = "${pipelineParams.dockerImage}"
-            CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
-            PROJECT_ID = 'jenkins-407204'
-            CLUSTER_NAME = 'demo'
-            LOCATION =  'us-central1'
-            IMAGE_TAG = "${env.BUILD_NUMBER}"  
         }
 
         stages {
