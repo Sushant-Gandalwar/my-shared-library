@@ -4,8 +4,8 @@ def call(Map pipelineParams) {
 
         environment {
             scmUrl = "${pipelineParams.scmUrl}"
-            APP_Name = "${pipelineParams.git}"
-            sushant-git = "${pipelineParams.appName}"
+            APP_Name = "${pipelineParams.appName}"
+            sushant-git = "${pipelineParams.git}"
             DOCKERDIRECTORY = "${pipelineParams.dockerDirectory}"
             IMAGE = "${pipelineParams.dockerImage}"
             CREDENTIALS_ID = "${pipelineParams.dockerCredentialsId}"
