@@ -21,11 +21,8 @@ def call(Map pipelineParams) {
                         echo "Initializing environment for webstore delivery pipeline"
                         checkout([$class: 'GitSCM',
                                   branches: [[name: "main"]], 
-                                  doGenerateSubmoduleConfigurations: false, 
-                                  extensions: [],
-                                  submoduleCfg: [],
                                   userRemoteConfigs: [[credentialsId: 'sushant-git', 
-                                  url: 'https://github.com/Sushant-Gandalwar/Jenkins-Docker-Kubernetes-Project3']]])
+                                  url: pipelineParams.scmUrl]]])
                     }
                 }
                 post {
