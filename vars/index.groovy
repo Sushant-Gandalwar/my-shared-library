@@ -11,7 +11,7 @@ def call(Map pipelineParams) {
                 steps {
                     script {
                         echo "Initializing environment for webstore delivery pipeline"
-                        git branch: 'main', credentialsId: 'sushant-git', url: pipelineParams.scmUrl
+                        git branch: 'main', credentialsId: 'sushant-git', url: env.scmUrl
                     }
                 }
                 post {
