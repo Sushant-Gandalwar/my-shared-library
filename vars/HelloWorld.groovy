@@ -1,4 +1,3 @@
-// MySharedLibrary/vars/DockerPipeline.groovy
 
 def call(String gitUrl, String gitBranch, String imageName) {
     pipeline {
